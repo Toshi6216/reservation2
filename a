@@ -2,3 +2,11 @@ source /home/toshi/work/code_django/portfolio_reservation/venv_rsv/bin/activate
 
 pip install -r requirements.txt
 
+・memberの参加予約機能
+・memberのグループ加入申請機能
+・staffのグループ加入許可機能
+・スケジュールのcsvデータ保存
+・過去のスケジュールデータを削除（csv保存したうえで）
+・予約時のstaffへの通知機能
+・グループ加入申請時の通知機能
+

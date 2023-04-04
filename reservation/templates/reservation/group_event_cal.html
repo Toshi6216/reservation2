@@ -54,12 +54,12 @@
                 </table>
         </div>
 
-
+    <div class="card-deck d-flex flex-wrap" >
         {% for event in event_data %}
             {% if now == event.event_date %}
-            <div class="active_event card border-info event_card {{event.event_date}}">
+            <div class="active_event card border-info event_card {{event.event_date}}" style="width:20rem;">
             {% else %}
-            <div class="event_hide card border-info event_card {{event.event_date}}">
+            <div class="event_hide card border-info event_card {{event.event_date}}" style="width:20rem;">
             {% endif %}
                 <div class="card-body ">
                 
@@ -76,6 +76,7 @@
         
             </div>  
         {% endfor %}
+    </div>  
  
            </div> 
         <div class="col-md-4">

@@ -4,21 +4,31 @@
     <div class="my-5">
         <h1>group!</h1>
     </div>
-    <div class="card-deck" >
+    <div class="card-deck d-flex flex-wrap" >
     {% for group in group_data %}
         {% comment %} <div class="card mb-3 col-lg-auto" style="width:20rem;"> {% endcomment %}
         {% comment %} <div class="card mb-3 " style="width:20rem;"> {% endcomment %}
-        <div class="card  " style="width:20rem;">
+        <div class="card  style="width:20rem;"" style="width:20rem;">
 
         {% comment %} <div class="row no-gutters"> {% endcomment %}
             {% comment %} <div class="col-md-8"> {% endcomment %}
                 <div class="card-body">
                     <h5 class="card-title">#{{ group.id }}/{{ group.group_name }}</h5>
                     <p class="card-text">{{ group.group_detail|truncatechars:100 }}</p>
+                {% for ap_group in group.approvedmember_set.all %}
+                {% if user_data == ap_group.member %}<!--staffでなければ表示しない-->
+                
                 <p class=""><a href="{% url 'group_detail' group.pk  %} " class="btn btn-success">group詳細</a>
-                {% if True %}<!--staffでなければ表示しない-->
-                <a href="{% url 'group_edit' group.pk  %} " class="btn btn-warning">group編集</a>
                 {% endif %}
+
+                {% endfor %}
+        
+                {% for ap_group in group.approvedstaff_set.all %}
+
+                {% if user_data == ap_group.staff %}<!--staffでなければ表示しない-->
+                    <a href="{% url 'group_edit' group.pk  %} " class="btn btn-warning">group編集</a>
+                {% endif %}
+                {% endfor %}
                 </p>
                 </div>
 

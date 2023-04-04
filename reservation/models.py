@@ -93,7 +93,7 @@ class ApplyingStaff(models.Model):
             ),
         ]
 
-
+#イベント参加申請
 class Join(models.Model):
     join_name = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     join_event = models.ForeignKey(Event, on_delete=models.CASCADE)

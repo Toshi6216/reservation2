@@ -26,7 +26,9 @@
                         <th class="header">所属(member)</th>
                         <td class="data">
                         {% for group_m in group_data_m %}
-                            {{ group_m.group }}
+                            
+                        <a href="{% url 'group_detail' group_m.group.pk  %} " class="btn btn-success">{{ group_m.group }}</a>
+
                         {% endfor %}
                         </td>
                     </tr>
@@ -34,7 +36,8 @@
                         <th class="header">所属(staff)</th>
                         <td class="data">
                         {% for group_s in group_data_s %}
-                            {{ group_s.group }}
+                        <a href="{% url 'group_detail' group_s.group.pk  %} " class="btn btn-success">{{ group_s.group }}</a>
+
                         {% endfor %}
                         </td>
                     </tr>

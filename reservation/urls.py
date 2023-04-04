@@ -3,19 +3,19 @@ from reservation import views
 
 
 urlpatterns = [
-    path('',views.IndexView.as_view(), name="home"),
-    path('event/',views.EventView.as_view(), name="event"),
-    path('group/',views.GroupView.as_view(), name="group"),
-    path('event_edit/<int:pk>/',views.EventEditView.as_view(), name="event_edit"),
-    path('group_edit/<int:pk>/',views.GroupEditView.as_view(), name="group_edit"),
-    path('group_detail/<int:pk>/',views.GroupDetailView.as_view(), name="group_detail"),
-    path('event_cal/',views.EventCalView.as_view(), name="event_cal"),
-    path('event_cal/<int:year>/<int:month>/',views.EventCalView.as_view(), name="event_cal"),
-    path('gp_event_cal/<int:year>/<int:month>/',views.GpEventCalView.as_view(), name="gp_event_cal"),
-    path('gp_event_cal/',views.GpEventCalView.as_view(), name="gp_event_cal"),
-    path('group_detail/<int:pk>/event_new/', views.EventCreateView.as_view(), name='event_new'),
-    path('group/new/', views.GroupCreateView.as_view(), name='group_new'),
-    path('group/signal/', views.groupSignal, name='group_signal'),
+    path('',views.IndexView.as_view(), name="home"), #top画面
+    path('event/',views.EventView.as_view(), name="event"), #イベント一覧
+    path('group/',views.GroupView.as_view(), name="group"), #グループ一覧
+    path('event_edit/<int:pk>/',views.EventEditView.as_view(), name="event_edit"), #イベント編集
+    path('group_edit/<int:pk>/',views.GroupEditView.as_view(), name="group_edit"), #グループ編集
+    path('group_detail/<int:pk>/',views.GroupDetailView.as_view(), name="group_detail"), #グループ詳細
+    # path('event_cal/',views.EventCalView.as_view(), name="event_cal"), #イベントカレンダー
+    # path('event_cal/<int:year>/<int:month>/',views.EventCalView.as_view(), name="event_cal"), #イベントカレンダー
+    path('gp_event_cal/<int:year>/<int:month>/',views.GpEventCalView.as_view(), name="gp_event_cal"), #イベントカレンダー(所属しているグループのイベント表示)
+    path('gp_event_cal/',views.GpEventCalView.as_view(), name="gp_event_cal"), #イベントカレンダー(所属しているグループのイベント表示)
+    path('group_detail/<int:pk>/event_new/', views.EventCreateView.as_view(), name='event_new'), #グループ詳細
+    path('group/new/', views.GroupCreateView.as_view(), name='group_new'), #グループ作成
+    path('group/signal/', views.groupSignal, name='group_signal'), #グループシグナル(#グループ登録時、同時にApprovedStaffにも登録される)
 
 
 ]

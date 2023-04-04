@@ -41,10 +41,39 @@ class GroupView(View):
     #このviewがコールされたら最初にget関数が呼ばれる
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.order_by('-id') #新しいものから順番に並べる
+        # approved_check_m = ApprovedMember.objects.filter(member=self.request.user, approved = True)
+        # approved_check_s = ApprovedStaff.objects.filter(staff=self.request.user, approved = True)
+
+        user_data = CustomUser.objects.get(email=self.request.user)
+        # for group in approved_check_m:
+        #     print(group.group, group.approved)
+            # print(group.approved)
+            # print(ap_chk_m.)
 
         return render(request, 'reservation/group_index.html',{
-            'group_data': group_data
+            'group_data': group_data,
+            # 'approved_check_m': approved_check_m,
+            # 'approved_check_s': approved_check_s,
+
+            'user_data': user_data,
         })
+
+    # def get(self, request, *args, **kwargs):
+    #     # group_data = Group.objects.order_by('-id') #新しいものから順番に並べる
+    #     approved_check_m = ApprovedMember.objects.filter(member=self.request.user, approved = True)
+    #     approved_check_s = ApprovedStaff.objects.filter(staff=self.request.user, approved = True)
+    #     print(approved_check_m)
+    #     print(approved_check_s)
+    #     chk_m=[ap_chk_m.group for ap_chk_m in approved_check_m]
+    #     chk_s=[ap_chk_s.group for ap_chk_s in approved_check_s]
+    #     print(chk_m)
+    #     print(chk_s)
+    #     group_data = Group.objects.filter(Q(group_name__in=chk_m)|Q(group_name__in=chk_s))
+    #     print(group_data)
+    #     return render(request, 'reservation/group_index.html',{
+    #         'group_data': group_data
+
+    #     })
 
 #イベント編集
 class EventEditView(UpdateView):
@@ -208,7 +237,7 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 #グループ登録
 class GroupCreateView(LoginRequiredMixin, CreateView):
     #誰でもグループを作れる
-    #グループを作った本人は自動的にstaff,member権限付与
+    #グループを作った本人は自動的にstaff権限付与
 
     model = Group
     template_name = 'reservation/group_form.html'
@@ -221,13 +250,12 @@ class GroupCreateView(LoginRequiredMixin, CreateView):
         obj.save()
         return super().form_valid(form)
     
-@receiver(post_save, sender=Group)
+@receiver(post_save, sender=Group) #グループ登録時、同時にApprovedStaffにも登録される
 def groupSignal(sender, instance, created, **kwargs):
     if created:
         user = instance.group_owner
         ApprovedStaff.objects.create(staff=user, group=instance, approved=True)
-# post_save.connect(groupSignal, sender=Group)
-
+   
 
 
 #１つのグループが行うイベントカレンダー イベント参加ボタン
