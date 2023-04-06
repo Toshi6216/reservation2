@@ -30,19 +30,34 @@
                         <li class="list-group-item">
                         <p>【STAFF申請中】</p>
 
+                        <form action="" method="POST">
+                            {% csrf_token %}
                             {% for applying_s in group_data.applyingstaff_set.all %}
-
-                            <label><input type="checkbox" name="applying_staff" value="{{ applying_s.staff }}">{{ applying_s.staff }}</label>,
+                                <label><input type="checkbox" name="applying_staff" value="{{ applying_s.staff }}">{{ applying_s.staff }}</label>,
                             
                             {% endfor %}
+                            {% if group_data.applyingstaff_set.all %}
+                            <input type="submit" value="送信">
+                            {% endif %}
+                        </form>
 
                         </li>
                         <li class="list-group-item">
-                        <p>【STAFF申請中】</p>
+                        <p>【MEMBER申請中】</p>
+                        <form action="" method="POST">
+                            {% csrf_token %}
+
                             {% for applying_m in group_data.applyingmember_set.all %}
 
                             <label><input type="checkbox" name="applying_member" value="{{ applying_m.member }}">{{ applying_m.member }}</label>,
                             {% endfor %}
+
+                            {% if group_data.applyingmember_set.all %}
+                            <input type="submit" value="送信">
+                            {% endif %}
+
+                        </form>
+
                         </li>
                         <li class="list-group-item">
                         <p>【EVENT】</p>

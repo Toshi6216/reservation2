@@ -120,9 +120,9 @@ class GroupDetailView(View):
         # print(f"staff_names:{staff_names}")
         # print(request.user in staff_names)
 
-        print(group_data.applyingmember_set.all())
-        for apy_m in group_data.applyingmember_set.all():
-            print(apy_m.member)
+        # print(group_data.applyingmember_set.all())
+        # for apy_m in group_data.applyingmember_set.all():
+        #     print(apy_m.member)
 
         if (request.user in staff_names) or  (request.user in member_names):
             return render(request, 'reservation/group_detail.html',{
