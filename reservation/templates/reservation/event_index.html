@@ -15,9 +15,12 @@
                 
                     <h5 class="card-title">#{{ event.id }}/{{ event.event_title }}</h5>
                     <p class="card-text">{{ event.event_detail|truncatechars:100 }}</p>
-                    <p class="card-text"><a href="{% url 'group_detail'  event.group.pk  %} " class="nav-link">{{ event.group }}</a></p>
-                    {% if is_group_staff %}<!--staffでなければ表示しない-->
+                    {% comment %} <p class="card-text"><a href="{% url 'group_detail'  event.group.pk  %} " class="nav-link"> {% endcomment %}
+                    <p>グループ：<a href="{% url 'group_detail' event.group.pk  %} " class="btn btn-success">{{ event.group }}</a></p>
+
+                    {% if True %}<!--staffでなければ表示しない-->
                         <a href="{% url 'event_edit' event.pk  %} " class="btn btn-warning">event編集</a>
+                        <a href="{% url 'event_delete' event.pk %}" class="btn btn-danger">削除する</a>
                     {% endif %}
                 </div>
             </div>

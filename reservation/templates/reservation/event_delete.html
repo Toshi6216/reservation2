@@ -1,0 +1,11 @@
+{% extends 'reservation/base.html' %}
+
+{% block content %}
+    <h2 class="my-4">{{ event.title }}</h2>
+    <hr>
+    <h5 class="my-4">削除してもよいですか？</h5>
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">削除する</button>
+    </form>
+{% endblock %}

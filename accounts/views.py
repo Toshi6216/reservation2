@@ -20,12 +20,6 @@ class OnlyYouMixin(UserPassesTestMixin):
         return user.pk == self.kwargs['pk'] or user.is_superuser
 
 #Profile内容確認用view
-# class ProfileView(OnlyYouMixin, DetailView):
-#     model = CustomUser
-#     template_name = 'account/profile.html'
-
-
-
 class ProfileView(OnlyYouMixin, DetailView):
     model = CustomUser
     template_name = 'account/profile.html'
@@ -34,6 +28,10 @@ class ProfileView(OnlyYouMixin, DetailView):
         user_data = CustomUser.objects.get(email=self.request.user)
         group_data_m = ApprovedMember.objects.filter(member=user_data, approved=True)
         group_data_s = ApprovedStaff.objects.filter(staff=user_data, approved=True)
+        # print(user_data.applyingmember_set.all())
+        applyings_m = user_data.applyingmember_set.all()
+        for applying_m in applyings_m:
+            print(applying_m.group)
         return render(request, self.template_name,{
             'group_data_m':group_data_m,
             'group_data_s':group_data_s,

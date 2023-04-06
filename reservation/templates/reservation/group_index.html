@@ -6,22 +6,16 @@
     </div>
     <div class="card-deck d-flex flex-wrap" >
     {% for group in group_data %}
-        {% comment %} <div class="card mb-3 col-lg-auto" style="width:20rem;"> {% endcomment %}
-        {% comment %} <div class="card mb-3 " style="width:20rem;"> {% endcomment %}
+
         <div class="card  style="width:20rem;"" style="width:20rem;">
 
-        {% comment %} <div class="row no-gutters"> {% endcomment %}
-            {% comment %} <div class="col-md-8"> {% endcomment %}
                 <div class="card-body">
                     <h5 class="card-title">#{{ group.id }}/{{ group.group_name }}</h5>
+                    <p>グループオーナー：{{ group.group_owner.nickname }}</p>
                     <p class="card-text">{{ group.group_detail|truncatechars:100 }}</p>
-                {% for ap_group in group.approvedmember_set.all %}
-                {% if user_data == ap_group.member %}<!--staffでなければ表示しない-->
-                
+        
                 <p class=""><a href="{% url 'group_detail' group.pk  %} " class="btn btn-success">group詳細</a>
-                {% endif %}
 
-                {% endfor %}
         
                 {% for ap_group in group.approvedstaff_set.all %}
 
@@ -32,8 +26,6 @@
                 </p>
                 </div>
 
-            {% comment %} </div> {% endcomment %}
-        {% comment %} </div> {% endcomment %}
         </div>
     {% endfor %}
     </div>

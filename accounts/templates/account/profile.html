@@ -18,11 +18,17 @@
                         <th class="header">ニックネーム</th>
                         <td class="data">{{ user.nickname }}</td>
                     </tr>
-                    {% comment %} <tr>
-                        <th class="header">staff</th>
-                        <td class="data">{{ user.staff }}</td>
+                    <tr>
+                        <th class="header">所属(staff)</th>
+                        <td class="data">
+                        {% for group_s in group_data_s %}
+                        <a href="{% url 'group_detail' group_s.group.pk  %} " class="btn btn-success">{{ group_s.group }}</a>
+
+                        {% endfor %}
+                        </td>
                     </tr>
-                    <tr> {% endcomment %}
+    
+                    <tr> 
                         <th class="header">所属(member)</th>
                         <td class="data">
                         {% for group_m in group_data_m %}
@@ -32,12 +38,24 @@
                         {% endfor %}
                         </td>
                     </tr>
+                    
                     <tr>
-                        <th class="header">所属(staff)</th>
+                        <th class="header">申請中(staff)</th>
                         <td class="data">
-                        {% for group_s in group_data_s %}
-                        <a href="{% url 'group_detail' group_s.group.pk  %} " class="btn btn-success">{{ group_s.group }}</a>
+                        {% for applying_s in user.applyingstaff_set.all %}
 
+                        {{ applying_s.group }},
+                        {% endfor %}
+
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="header">申請中(member)</th>
+                        <td class="data">
+                        {% for applying_m in user.applyingmember_set.all %}
+
+                        {{ applying_m.group }},
                         {% endfor %}
                         </td>
                     </tr>

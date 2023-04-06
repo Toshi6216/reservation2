@@ -1,10 +1,10 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView, View, UpdateView, CreateView
+from django.shortcuts import render, redirect
+from django.views.generic import TemplateView, View, UpdateView, CreateView, DeleteView
 from .models import Group, Event, ApprovedMember, ApprovedStaff, ApplyingMember, ApplyingStaff
 from .forms import EventForm, GroupForm
 from accounts.models import CustomUser
 from django.urls import reverse_lazy
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from django.template import loader
 from django.http import Http404
 import time
@@ -41,39 +41,15 @@ class GroupView(View):
     #このviewがコールされたら最初にget関数が呼ばれる
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.order_by('-id') #新しいものから順番に並べる
-        # approved_check_m = ApprovedMember.objects.filter(member=self.request.user, approved = True)
-        # approved_check_s = ApprovedStaff.objects.filter(staff=self.request.user, approved = True)
-
+        for g in group_data:
+            print(g.group_owner.nickname)
         user_data = CustomUser.objects.get(email=self.request.user)
-        # for group in approved_check_m:
-        #     print(group.group, group.approved)
-            # print(group.approved)
-            # print(ap_chk_m.)
 
         return render(request, 'reservation/group_index.html',{
             'group_data': group_data,
-            # 'approved_check_m': approved_check_m,
-            # 'approved_check_s': approved_check_s,
-
             'user_data': user_data,
         })
 
-    # def get(self, request, *args, **kwargs):
-    #     # group_data = Group.objects.order_by('-id') #新しいものから順番に並べる
-    #     approved_check_m = ApprovedMember.objects.filter(member=self.request.user, approved = True)
-    #     approved_check_s = ApprovedStaff.objects.filter(staff=self.request.user, approved = True)
-    #     print(approved_check_m)
-    #     print(approved_check_s)
-    #     chk_m=[ap_chk_m.group for ap_chk_m in approved_check_m]
-    #     chk_s=[ap_chk_s.group for ap_chk_s in approved_check_s]
-    #     print(chk_m)
-    #     print(chk_s)
-    #     group_data = Group.objects.filter(Q(group_name__in=chk_m)|Q(group_name__in=chk_s))
-    #     print(group_data)
-    #     return render(request, 'reservation/group_index.html',{
-    #         'group_data': group_data
-
-    #     })
 
 #イベント編集
 class EventEditView(UpdateView):
@@ -138,11 +114,15 @@ class GroupDetailView(View):
         staff_names = {s_data.staff for s_data in staff_data}
         """グループ加入の承認済みデータのリストに名前があり、かつapprovedでないと別ページにリダイレクトされる"""
         is_group_staff = self.request.user in staff_names
-        print("is_group_staff:",is_group_staff)
-        print(f"member_names:{member_names}")
-        print(request.user in member_names)
-        print(f"staff_names:{staff_names}")
-        print(request.user in staff_names)
+        # print("is_group_staff:",is_group_staff)
+        # print(f"member_names:{member_names}")
+        # print(request.user in member_names)
+        # print(f"staff_names:{staff_names}")
+        # print(request.user in staff_names)
+
+        print(group_data.applyingmember_set.all())
+        for apy_m in group_data.applyingmember_set.all():
+            print(apy_m.member)
 
         if (request.user in staff_names) or  (request.user in member_names):
             return render(request, 'reservation/group_detail.html',{
@@ -233,6 +213,22 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         obj.save()
         return super().form_valid(form)
     
+#イベント削除
+class EventDeleteView(View):
+
+    def get(self, request, *args, **kwargs):
+        event_data = Event.objects.get(id=self.kwargs['pk'])
+        return render(request, 'reservation/event_delete.html',{
+            'event_data': event_data
+        })
+
+    def post(self, request, *args, **kwargs):
+        event_data = Event.objects.get(id=self.kwargs['pk'])
+        pk = event_data.group.pk
+        print(pk)
+        event_data.delete()
+        #削除したイベントのグループページに遷移
+        return HttpResponseRedirect( reverse_lazy('group_detail', kwargs={'pk':pk}))
 
 #グループ登録
 class GroupCreateView(LoginRequiredMixin, CreateView):

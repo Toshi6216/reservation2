@@ -66,10 +66,8 @@
                     <h5 class="card-title">#{{ event.id }}/{{ event.event_title }} <div class="date_class">{{event.event_date}}</div></h5>
                     <p>{{ event.start_time }}-{{ event.end_time }}</p>
                     <p class="card-text ">{{ event.event_detail|truncatechars:100 }}</p>
-                    <p ><a href="{% url 'group_detail'  event.group.pk  %} " class="">{{ event.group }}</a></p>
-                    {% comment %} {% if user.email==approved_check.member %}
-                        <a href="{% url 'event_edit' event.pk  %} " class="nav-link">event編集</a>
-                    {% endif %} {% endcomment %}
+                    
+                    <p ><a href="{% url 'group_detail' event.group.pk  %} " class="btn btn-success">{{ event.group }}</a></p>
 
                 </div>
 
@@ -82,7 +80,7 @@
         <div class="col-md-4">
   
             <div class="card">
-            <h5 class="card-header">group menber...</h5>
+            <h5 class="card-header">group member...</h5>
             </div>
         </div>
 
