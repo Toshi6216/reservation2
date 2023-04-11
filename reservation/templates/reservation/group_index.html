@@ -14,15 +14,21 @@
                     <p>グループオーナー：{{ group.group_owner.nickname }}</p>
                     <p class="card-text">{{ group.group_detail|truncatechars:100 }}</p>
         
-                <p class=""><a href="{% url 'group_detail' group.pk  %} " class="btn btn-success">group詳細</a>
+            {% if g_member in  %}<!--staffでなければ表示しない-->
 
+                <p class=""><a href="{% url 'group_detail' group.pk  %} " class="btn btn-success">group詳細</a>
+            {% endif %}
         
                 {% for ap_group in group.approvedstaff_set.all %}
 
-                {% if user_data == ap_group.staff %}<!--staffでなければ表示しない-->
-                    <a href="{% url 'group_edit' group.pk  %} " class="btn btn-warning">group編集</a>
-                {% endif %}
+                    {% if user_data == ap_group.staff %}<!--staffでなければ表示しない-->
+                        <a href="{% url 'group_edit' group.pk  %} " class="btn btn-warning">group編集</a>
+                    {% endif %}
+                    
                 {% endfor %}
+                
+                
+
                 </p>
                 </div>
 

@@ -18,6 +18,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.contrib import messages
+from django.db import transaction
 
 # from dateutil.relativedelta import relativedelta 
 
@@ -127,6 +129,7 @@ class GroupDetailView(DetailView):
 
     model=Group
     template_name = 'reservation/group_detail.html'
+
     def get(self, request, *args, **kwargs):
         print("getメソッド")
         group_data = Group.objects.get(id=self.kwargs['pk'])
@@ -143,6 +146,9 @@ class GroupDetailView(DetailView):
         # for n in staff_data:
         #     print(n.staff)
         # print("-------")
+        applying_staffs=ApplyingStaff.objects.filter(group=group_data, applying=True)
+        applying_members=ApplyingMember.objects.filter(group=group_data, applying=True)
+
 
         member_names = {m_data.member for m_data in member_data}
         staff_names = {s_data.staff for s_data in staff_data}
@@ -163,7 +169,10 @@ class GroupDetailView(DetailView):
                 'member_names':member_names,
                 'staff_names':staff_names,
                 'event_data':event_data,
-                'is_group_staff':is_group_staff
+                'is_group_staff':is_group_staff,
+                'applying_staffs':applying_staffs,
+                'applying_members':applying_members,
+
             }
 
         if (request.user in staff_names) or  (request.user in member_names):
@@ -173,41 +182,115 @@ class GroupDetailView(DetailView):
         #########################
     def get_object(self):
         return get_object_or_404(Group, pk=self.kwargs.get('pk'))
+    
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
         group = self.get_object()
-        # print(group)
         pk= group.pk
+        self.object = self.get_object()
+
+        print(request.POST)
         if 'applying_staff' in request.POST:
-            applying_staffs=request.POST.getlist('applying_staff')
-            print("applying_staff******")
-            print(applying_staffs)
-            applying_s_update=[]
-            # obj=ApplyingStaff.objects.get(pk__in=applying_staffs)
-            for ap_s_update in ApplyingStaff.objects.filter(pk__in=applying_staffs):
-                print(ap_s_update.applying)
-                print(ap_s_update.staff)
-                # print(ap_s_update.staff.approvedstaff_set.approved)
-            print("approved****")
-            # aprvd_s=ap_s_update.staff.approvedstaff_set.approved
-            # for apploved_s_update in aprvd_s:
-            #     print(apploved_s_update)
-            # print(aprvd_s)
-                
-            # staffs=ApplyingStaff.objects.all()
-            # for staff in staffs:
-            #     print(staff.staff, staff.applying, staff.pk)
+            applying_staff_pks = request.POST.getlist('applying_staff')
+            # print(applying_staff_pks, applying_member_pks)
 
-        if 'applying_member' in request.POST:
-            applying_members=request.POST.getlist('applying_member')
-            print("applying_member********")
-            print(applying_members)
-            for applying_member in applying_members:
-                permission_member=applying_member
-                print(permission_member)
+            if not applying_staff_pks:
+                messages.error(request, '選択されたスタッフが存在しません。')
+                return redirect('group_detail', pk=pk)
+            
+            # print(applying_staff_pks)
+            applying_staff = ApplyingStaff.objects.filter(pk__in=applying_staff_pks, group=group, applying=True)
 
-        return redirect('group_detail', pk=pk)
+            # print("applying_staff****")
+            # for s in applying_staff:
+            #     print(s)
+
+            if applying_staff.count() != len(applying_staff_pks):
+                messages.error(request, '不正なスタッフが含まれています。')
+                return redirect('group_detail', pk=pk)
+            else:
+                print("applying_staff count ok")
+            
+            staff_pks = applying_staff.values_list('staff', flat=True)
+
+            # print("staff_pks:", staff_pks)
+            # if 'applying_staff' in request.POST:
+            print('applying_staff')
+            try:
+                with transaction.atomic():
+                    
+                    # ApprovedStaffを更新/作成
+                    approved_staff_list = []
+                    for staff_pk in staff_pks:
+                        approved_staff, created = ApprovedStaff.objects.get_or_create(staff_id=staff_pk, group=group)
+                        approved_staff.approved = True
+                        approved_staff_list.append(approved_staff)
+                    # print("approved********")
+                    # for apd_s in approved_staff_list:
+                    #     print(apd_s)
+                    # # print(approved_staff_list)
+                    # print("Before bulk_update:", approved_staff_list[0].approved)  # ここでログを出力
+                    ApprovedStaff.objects.bulk_update(approved_staff_list, ['approved'])
+                    # print("After bulk_update:", approved_staff_list[0].approved)  # ここでログを出力
+
+                    # ApplyingStaffを更新
+                    # print("applying******")
+                    # for apl_s in applying_staff:
+                    #     print(apl_s)
+                    applying_staff.delete()
+
+                messages.success(request, 'スタッフを承認しました。')
+            except Exception as e:
+                messages.error(request, 'スタッフの承認に失敗しました。')
+                print(e)
+
+            return redirect('group_detail', pk=pk)
+        
+        elif 'applying_member' in request.POST:
+            applying_member_pks = request.POST.getlist('applying_member')
+
+            if not applying_member_pks:
+                messages.error(request, '選択されたメンバーが存在しません。')
+                return redirect('group_detail', pk=pk)
+            
+            # print(applying_member_pks)
+            applying_member = ApplyingMember.objects.filter(pk__in=applying_member_pks, group=group, applying=True)
+
+            print("applying_member****")
+            for s in applying_member:
+                print(s)
+
+            if applying_member.count() != len(applying_member_pks):
+                messages.error(request, '不正なメンバーが含まれています。')
+                return redirect('group_detail', pk=pk)
+            else:
+                print("applying_member count ok")
+
+
+            member_pks = applying_member.values_list('member', flat=True)
+
+            print('applying_member')
+            try:
+                with transaction.atomic():
+                    
+                    # ApprovedMemberを更新/作成
+                    approved_member_list = []
+                    for member_pk in member_pks:
+                        approved_member, created = ApprovedMember.objects.get_or_create(member_id=member_pk, group=group)
+                        approved_member.approved = True
+                        approved_member_list.append(approved_member)
+
+                    ApprovedMember.objects.bulk_update(approved_member_list, ['approved'])
+
+                    applying_member.delete()
+
+                messages.success(request, 'スタッフを承認しました。')
+            except Exception as e:
+                messages.error(request, 'スタッフの承認に失敗しました。')
+                print(e)
+
+            return redirect('group_detail', pk=pk)
+        
         
 
 

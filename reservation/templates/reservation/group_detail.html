@@ -33,7 +33,7 @@
 
                         <form action="" method="POST">
                             {% csrf_token %}
-                            {% for applying_s in group_data.applyingstaff_set.all %}
+                            {% for applying_s in applying_staffs %}
                                 <label><input type="checkbox" name="applying_staff" value="{{ applying_s.pk }}">{{ applying_s.staff.nickname }}({{ applying_s.staff.last_name }} {{ applying_s.staff.first_name }})</label>,
                             
                             {% endfor %}
@@ -49,8 +49,7 @@
                         <form action="" method="POST">
                             {% csrf_token %}
 
-                            {% for applying_m in group_data.applyingmember_set.all %}
-
+                            {% for applying_m in applying_members %}
                             <label><input type="checkbox" name="applying_member" value="{{ applying_m.pk }}">{{ applying_m.member.nickname }}({{ applying_m.member.last_name }} {{ applying_m.member.first_name }})</label>,
 
                             {% endfor %}
