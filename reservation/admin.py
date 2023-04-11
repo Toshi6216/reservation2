@@ -5,16 +5,16 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('event_title', 'group', 'event_date', 'start_time', 'end_time')
 
 class ApplyingMemberAdmin(admin.ModelAdmin):
-    list_display = ('member', 'group', 'applying')
+    list_display = ('pk', 'member', 'group', 'applying')
 
 class ApplyingStaffAdmin(admin.ModelAdmin):
-    list_display = ('staff', 'group', 'applying')
+    list_display = ('pk', 'staff', 'group', 'applying')
 
 class ApprovedMemberAdmin(admin.ModelAdmin):
-    list_display = ('member', 'group', 'approved')
+    list_display = ('pk', 'member', 'group', 'approved')
 
 class ApprovedStaffAdmin(admin.ModelAdmin):
-    list_display = ('staff', 'group', 'approved',)
+    list_display = ('pk', 'staff', 'group', 'approved',)
 
 class JoinAdmin(admin.ModelAdmin):
     list_display = ('join_name', 'join_event', 'join')

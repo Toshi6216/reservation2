@@ -36,7 +36,7 @@ class SignupForm(UserCreationForm):
     
     class Meta:
         model = CustomUser
-        fields = ['email','first_name', 'last_name']
+        fields = ['email','first_name', 'last_name', 'nickname']
         
    # def signup(self, request, user):
    #     user.first_name = self.cleaned_data['first_name']

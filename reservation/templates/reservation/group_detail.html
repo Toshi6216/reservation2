@@ -27,18 +27,20 @@
                             {% endfor %} 
                         </li>
                         
+                        {% if is_group_staff %} <!--staffでなければ表示しない-->
                         <li class="list-group-item">
                         <p>【STAFF申請中】</p>
 
                         <form action="" method="POST">
                             {% csrf_token %}
                             {% for applying_s in group_data.applyingstaff_set.all %}
-                                <label><input type="checkbox" name="applying_staff" value="{{ applying_s.staff }}">{{ applying_s.staff }}</label>,
+                                <label><input type="checkbox" name="applying_staff" value="{{ applying_s.pk }}">{{ applying_s.staff.nickname }}({{ applying_s.staff.last_name }} {{ applying_s.staff.first_name }})</label>,
                             
                             {% endfor %}
                             {% if group_data.applyingstaff_set.all %}
-                            <input type="submit" value="送信">
+                                <input type="submit" value="送信">
                             {% endif %}
+
                         </form>
 
                         </li>
@@ -49,16 +51,18 @@
 
                             {% for applying_m in group_data.applyingmember_set.all %}
 
-                            <label><input type="checkbox" name="applying_member" value="{{ applying_m.member }}">{{ applying_m.member }}</label>,
+                            <label><input type="checkbox" name="applying_member" value="{{ applying_m.pk }}">{{ applying_m.member.nickname }}({{ applying_m.member.last_name }} {{ applying_m.member.first_name }})</label>,
+
                             {% endfor %}
 
                             {% if group_data.applyingmember_set.all %}
-                            <input type="submit" value="送信">
+                                <input type="submit" value="送信">
                             {% endif %}
 
                         </form>
 
                         </li>
+                        {% endif %}
                         <li class="list-group-item">
                         <p>【EVENT】</p>
                             {% for event in event_data %}

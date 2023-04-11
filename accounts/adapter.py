@@ -44,4 +44,5 @@ class AccountAdapter(DefaultAccountAdapter):
         user = super(AccountAdapter, self).save_user(request, user, form, commit=False)
         user.first_name = form.cleaned_data.get('first_name')
         user.last_name = form.cleaned_data.get('last_name')
+        user.nickname = form.cleaned_data.get('nickname')
         user.save()
