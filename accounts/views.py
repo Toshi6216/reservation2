@@ -9,6 +9,8 @@ from django.http import HttpResponse
 
 from accounts.models import CustomUser
 from .forms import ProfileForm
+from django.http import HttpResponse,HttpResponseRedirect
+
 
 #user確認用view
 class OnlyYouMixin(UserPassesTestMixin):
@@ -22,28 +24,37 @@ class OnlyYouMixin(UserPassesTestMixin):
 #Profile内容確認用view
 class ProfileView(OnlyYouMixin, DetailView):
     model = CustomUser
-    template_name = 'account/profile.html'
+    template_name = 'account/userprofile.html'
 
     def get(self, request, *args, **kwargs):
         user_data = CustomUser.objects.get(email=self.request.user)
         group_data_m = ApprovedMember.objects.filter(member=user_data, approved=True)
         group_data_s = ApprovedStaff.objects.filter(staff=user_data, approved=True)
         # print(user_data.applyingmember_set.all())
-        applyings_m = user_data.applyingmember_set.all()
-        for applying_m in applyings_m:
-            print(applying_m.group)
+        # applyings_m = user_data.applyingmember_set.all()
+        # for applying_m in applyings_m:
+        #     print(applying_m.group)
         return render(request, self.template_name,{
             'group_data_m':group_data_m,
             'group_data_s':group_data_s,
             'user_data':user_data,
         })
 
+    def post(self, request, *args, **kwargs):
+        user_data = CustomUser.objects.get(email=self.request.user)
+        pk=user_data.pk
+        applying_member_pks = request.POST.getlist('applying_m_group')
+        print(applying_member_pks)
+        applying_member = ApplyingMember.objects.filter(pk__in=applying_member_pks, applying=True)
+        print(applying_member)
+        applying_member.delete()
+        return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
 class ProfileEditView(OnlyYouMixin, UpdateView):
     model = CustomUser
-    template_name = 'account/profile_form.html'
+    template_name = 'account/userprofile_form.html'
     form_class = ProfileForm
     
     def get_success_url(self):
-        return reverse("profile", kwargs={"pk": self.kwargs["pk"]})
+        return reverse("userprofile", kwargs={"pk": self.kwargs["pk"]})
 

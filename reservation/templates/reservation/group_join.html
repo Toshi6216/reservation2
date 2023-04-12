@@ -1,0 +1,35 @@
+{% extends 'reservation/base.html' %}
+
+{% block content %}
+    <div class="my-5">
+        <h1>グループ加入申請</h1>
+    </div>
+
+    <div class="card mb-3 col-lg-auto" style="">
+        <div class="row no-gutters">
+
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }}</h4>
+                    <h5>グループオーナー：{{ group_data.group_owner.nickname }}</h5>
+                    <ul class="list-group listgroup-flush mb-3">
+                        <li class="list-group-item">
+                        <p class="card-text mb-3">{{ group_data.group_detail }}</p>
+                        
+                        </li>
+                        <li class="list-group-item">
+                        <form action="" method="POST">
+                        {% csrf_token %}
+                            <p>このグループにメンバーとして加入申請しますか？</p>
+                            <p><button type="submit" class="btn btn-primary">加入申請</button></p>
+                        </form>
+                        </li>
+                    </ul>
+
+                </div>
+            
+        </div>
+    </div>
+
+
+{% endblock %}

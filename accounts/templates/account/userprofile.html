@@ -53,16 +53,23 @@
                     <tr>
                         <th class="header">申請中(member)</th>
                         <td class="data">
+                        <form action="" method="POST">
+                            {% csrf_token %}
                         {% for applying_m in user.applyingmember_set.all %}
 
-                        {{ applying_m.group }},
+                        <label><input type="checkbox" name="applying_m_group" value="{{ applying_m.pk }}">
+                        {{ applying_m.group }}</label>,
                         {% endfor %}
+                        {% if user.applyingmember_set.all %}
+                        <p><input type="submit" value="申請中止" class="btn btn-warning"></p>
+                        {% endif %}
+                        </form>
                         </td>
                     </tr>
                 </tbody>
             </table>
             <div class="button my-3 mx-auto">
-                <a href="{% url 'profile_form' user.pk %}" class="btn btn-lg btn-warning btn-block">編集する</a>
+                <a href="{% url 'userprofile_form' user.pk %}" class="btn btn-lg btn-warning btn-block">編集する</a>
             </div>
         </div>
     </div>

@@ -14,22 +14,32 @@
                     <p>グループオーナー：{{ group.group_owner.nickname }}</p>
                     <p class="card-text">{{ group.group_detail|truncatechars:100 }}</p>
         
-            {% if g_member in  %}<!--staffでなければ表示しない-->
+            <!--staffでなければ表示しない-->
+                {% if group.group_name in approvedmember_grouplist %}<!--メンバーなら表示-->
 
                 <p class=""><a href="{% url 'group_detail' group.pk  %} " class="btn btn-success">group詳細</a>
-            {% endif %}
+                
+                {% endif %}
         
-                {% for ap_group in group.approvedstaff_set.all %}
 
-                    {% if user_data == ap_group.staff %}<!--staffでなければ表示しない-->
-                        <a href="{% url 'group_edit' group.pk  %} " class="btn btn-warning">group編集</a>
-                    {% endif %}
-                    
-                {% endfor %}
-                
-                
 
+      
+                {% if not group.group_name in approvedmember_grouplist %}<!--すでにメンバーなら表示しない-->
+                {% if not group.group_name in applyingmember_grouplist %}<!--加入申請していないなら表示-->
+
+            
+                <p class=""><a href="{% url 'group_join' group.pk  %} " class="btn btn-primary">加入申請</a>
                 </p>
+                {% endif %}
+                {% endif %}
+
+
+                {% comment %} {% if  group.group_name in applyingmember_grouplist %}<!--加入申請していたら表示-->
+            
+                <p class=""><a href="{% url 'group_join_cancel' group.pk  %} " class="btn btn-secondary">加入申請取消</a>
+                </p>
+                {% endif %} {% endcomment %}
+
                 </div>
 
         </div>

@@ -21,7 +21,7 @@
     
     みんなの予約サイト
     
-    </a>
+    </a> 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -41,7 +41,7 @@
 
         {% if user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'profile' user.pk %}">Profile<span class="sr-only"></span></a>
+                <a class="nav-link" href="{% url 'userprofile' user.pk %}">Profile<span class="sr-only"></span></a>
             </li>
             
             <li class="nav-item">
@@ -74,9 +74,15 @@
             </li>
 
         {% endif %}
+            
         </ul>
+        {% comment %} <ul class="navbar-nav " style="float: right">
+        <li class="nav-item" >
+            <a class="navbar-brand" href="">{{user.nickname}} <span class="sr-only"></span></a>
+            {{user.nickname}}
+        </li>
+        </ul> {% endcomment %}
 
-    </div>
     </div>
     </nav> 
     <!--navbar-->
@@ -85,7 +91,9 @@
 
     <main>
         <div class="container">
- 
+        
+            <p >{{user.nickname}}</p>
+        
             {% block content %}
             {% endblock %}
 
