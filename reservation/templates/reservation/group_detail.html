@@ -10,7 +10,7 @@
 
             <div class="col-md-8">
                 <div class="card-body">
-                    <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }}</h4>
+                    <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }} <a href="{% url 'group_join_staff' group_data.pk  %} " class="btn btn-danger">スタッフ申請</a></h4>
                     <h5>グループオーナー：{{ group_data.group_owner.nickname }}</h5>
                     <p class="card-text mb-3">{{ group_data.group_detail }}</p>
                     <ul class="list-group listgroup-flush mb-3">
@@ -87,6 +87,10 @@
                     {% if is_group_staff %}<!--staffでなければ表示しない-->
                         <a href="{% url 'event_edit' event.pk  %} " class="btn btn-warning">event編集</a>
                         <a href="{% url 'event_delete' event.pk %}" class="btn btn-danger">削除する</a>
+                    {% endif %}
+                    {% if is_group_member %}<!---->
+                        <a href="# " class="btn btn-warning">event参加</a>
+                        
                     {% endif %}
                 </div>
 

@@ -42,11 +42,16 @@
                     <tr>
                         <th class="header">申請中(staff)</th>
                         <td class="data">
+                        <form action="" method="POST">
+                            {% csrf_token %}
                         {% for applying_s in user.applyingstaff_set.all %}
-
-                        {{ applying_s.group }},
+                        <label><input type="checkbox" name="applying_s_group" value="{{ applying_s.pk }}">
+                        {{ applying_s.group }}</label>,
                         {% endfor %}
-
+                        {% if user.applyingstaff_set.all %}
+                        <p><input type="submit" value="申請中止" class="btn btn-warning"></p>
+                        {% endif %}
+                        </form>
 
                         </td>
                     </tr>

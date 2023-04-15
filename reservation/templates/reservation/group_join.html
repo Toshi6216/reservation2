@@ -20,7 +20,7 @@
                         <li class="list-group-item">
                         <form action="" method="POST">
                         {% csrf_token %}
-                            <p>このグループにメンバーとして加入申請しますか？</p>
+                            <p>このグループに{{ staff_or_member }}として加入申請しますか？</p>
                             <p><button type="submit" class="btn btn-primary">加入申請 </button></p>
                         </form>
                         </li>

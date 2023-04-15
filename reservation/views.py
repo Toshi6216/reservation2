@@ -423,7 +423,8 @@ class GroupJoinView(View):
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
         return render(request, 'reservation/group_join.html',{
-            'group_data': group_data
+            'group_data': group_data,
+            'staff_or_member':'メンバー',
         })
 
     def post(self, request, *args, **kwargs):
@@ -436,6 +437,22 @@ class GroupJoinView(View):
         # return HttpResponseRedirect( reverse_lazy('group'))
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
+class GroupJoinStaffView(View):
+    model=Group
+    def get(self, request, *args, **kwargs):
+        group_data = Group.objects.get(id=self.kwargs['pk'])
+        return render(request, 'reservation/group_join.html',{
+            'group_data': group_data,
+            'staff_or_member':'スタッフ',
+        })
 
+    def post(self, request, *args, **kwargs):
+        group_data = Group.objects.get(id=self.kwargs['pk'])
+        user_data = CustomUser.objects.get(email=self.request.user)
+        user_data.applyingstaff_set.create(staff=self.request.user, group=group_data, applying=True)
+        pk=user_data.pk
+        print(pk)
+
+        return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
 

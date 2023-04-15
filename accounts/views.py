@@ -41,14 +41,24 @@ class ProfileView(OnlyYouMixin, DetailView):
         })
 
     def post(self, request, *args, **kwargs):
-        user_data = CustomUser.objects.get(email=self.request.user)
-        pk=user_data.pk
-        applying_member_pks = request.POST.getlist('applying_m_group')
-        print(applying_member_pks)
-        applying_member = ApplyingMember.objects.filter(pk__in=applying_member_pks, applying=True)
-        print(applying_member)
-        applying_member.delete()
-        return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
+        if 'applying_m_group' in request.POST:
+            user_data = CustomUser.objects.get(email=self.request.user)
+            pk=user_data.pk
+            applying_member_pks = request.POST.getlist('applying_m_group')
+            print(applying_member_pks)
+            applying_member = ApplyingMember.objects.filter(pk__in=applying_member_pks, applying=True)
+            print(applying_member)
+            applying_member.delete()
+            return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
+        elif 'applying_s_group' in request.POST:
+            user_data = CustomUser.objects.get(email=self.request.user)
+            pk=user_data.pk
+            applying_staff_pks = request.POST.getlist('applying_s_group')
+            print(applying_staff_pks)
+            applying_staff = ApplyingStaff.objects.filter(pk__in=applying_staff_pks, applying=True)
+            print(applying_staff)
+            applying_staff.delete()
+            return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
 class ProfileEditView(OnlyYouMixin, UpdateView):
     model = CustomUser
