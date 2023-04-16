@@ -139,6 +139,8 @@ class GroupDetailView(DetailView):
         staff_names = {s_data.staff for s_data in staff_data}
         """グループ加入の承認済みデータのリストに名前があり、かつapprovedでないと別ページにリダイレクトされる"""
         is_group_staff = self.request.user in staff_names
+        is_group_member = self.request.user in member_names
+
    
         ctx={
                 'group_data':group_data,
@@ -147,6 +149,7 @@ class GroupDetailView(DetailView):
                 'staff_names':staff_names,
                 'event_data':event_data,
                 'is_group_staff':is_group_staff,
+                'is_group_member':is_group_member,
                 'applying_staffs':applying_staffs,
                 'applying_members':applying_members,
 
@@ -455,4 +458,20 @@ class GroupJoinStaffView(View):
 
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
+class EventJoinView(View):
+    model=Event
+    def get(self, request, *args, **kwargs):
+        event = Event.objects.get(id=self.kwargs['pk'])
+        return render(request, 'reservation/event_join.html',{
+            'event': event,
+            
+        })
 
+    def post(self, request, *args, **kwargs):
+        event = Event.objects.get(id=self.kwargs['pk'])
+        user_data = CustomUser.objects.get(email=self.request.user)
+        user_data.join_set.create(join_name=self.request.user, join_event=event, join=True)
+        pk=user_data.pk
+        print(pk)
+        
+        return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))

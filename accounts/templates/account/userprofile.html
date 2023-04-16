@@ -71,6 +71,23 @@
                         </form>
                         </td>
                     </tr>
+                    <tr>
+                        <th class="header">予約済イベント</th>
+                        <td class="data">
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                        {% for event in event_join %}
+                            <p>
+                            <label><input type="checkbox" name="event_join" value="{{ event.pk }}">
+                            {{event.join_event.event_date}} {{ event.join_event }} (主催：{{ event.join_event.group }})</label>
+                            </p>
+                        {% endfor %}
+                        {% if user.join_set.all %}
+                        <p><input type="submit" value="予約中止" class="btn btn-warning"></p>
+                        {% endif %}
+                        </form>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="button my-3 mx-auto">

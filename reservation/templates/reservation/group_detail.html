@@ -89,7 +89,9 @@
                         <a href="{% url 'event_delete' event.pk %}" class="btn btn-danger">削除する</a>
                     {% endif %}
                     {% if is_group_member %}<!---->
-                        <a href="# " class="btn btn-warning">event参加</a>
+                       <p class="my-1">
+                        <a href="{% url 'event_join' event.pk  %} " class="btn btn-success">event参加</a>
+                       </p>
                         
                     {% endif %}
                 </div>

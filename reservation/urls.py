@@ -19,6 +19,7 @@ urlpatterns = [
     path('group/signal/', views.groupSignal, name='group_signal'), #グループシグナル(#グループ登録時、同時にApprovedStaffにも登録される)
     path('group_join/<int:pk>/', views.GroupJoinView.as_view(), name='group_join'), #グループ加入申請
     path('group_join_staff/<int:pk>/', views.GroupJoinStaffView.as_view(), name='group_join_staff'), #グループ加入申請(Staff)
+    path('event_join/<int:pk>/', views.EventJoinView.as_view(), name='event_join'), #イベント予約
 
 
 

@@ -30,6 +30,7 @@ class ProfileView(OnlyYouMixin, DetailView):
         user_data = CustomUser.objects.get(email=self.request.user)
         group_data_m = ApprovedMember.objects.filter(member=user_data, approved=True)
         group_data_s = ApprovedStaff.objects.filter(staff=user_data, approved=True)
+        event_join=Join.objects.filter(join_name=self.request.user, join=True).order_by('join_event__event_date')
         # print(user_data.applyingmember_set.all())
         # applyings_m = user_data.applyingmember_set.all()
         # for applying_m in applyings_m:
@@ -38,6 +39,7 @@ class ProfileView(OnlyYouMixin, DetailView):
             'group_data_m':group_data_m,
             'group_data_s':group_data_s,
             'user_data':user_data,
+            'event_join':event_join,
         })
 
     def post(self, request, *args, **kwargs):
