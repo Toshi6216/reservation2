@@ -43,7 +43,7 @@ class ProfileView(OnlyYouMixin, DetailView):
         })
 
     def post(self, request, *args, **kwargs):
-        if 'applying_m_group' in request.POST:
+        if 'applying_m_group' in request.POST: #メンバー申請取消
             user_data = CustomUser.objects.get(email=self.request.user)
             pk=user_data.pk
             applying_member_pks = request.POST.getlist('applying_m_group')
@@ -52,7 +52,7 @@ class ProfileView(OnlyYouMixin, DetailView):
             print(applying_member)
             applying_member.delete()
             return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
-        elif 'applying_s_group' in request.POST:
+        elif 'applying_s_group' in request.POST: #スタッフ申請取消
             user_data = CustomUser.objects.get(email=self.request.user)
             pk=user_data.pk
             applying_staff_pks = request.POST.getlist('applying_s_group')
@@ -60,6 +60,15 @@ class ProfileView(OnlyYouMixin, DetailView):
             applying_staff = ApplyingStaff.objects.filter(pk__in=applying_staff_pks, applying=True)
             print(applying_staff)
             applying_staff.delete()
+            return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
+        elif 'event_join' in request.POST: #イベント予約取消
+            user_data = CustomUser.objects.get(email=self.request.user)
+            pk=user_data.pk
+            event_join_pks = request.POST.getlist('event_join')
+            print(event_join_pks)
+            event_join = Join.objects.filter(pk__in=event_join_pks, join=True)
+
+            event_join.delete()
             return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
 class ProfileEditView(OnlyYouMixin, UpdateView):

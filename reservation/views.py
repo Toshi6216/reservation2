@@ -413,7 +413,7 @@ def groupSignal(sender, instance, created, **kwargs):
    
 
 
-#１つのグループが行うイベントカレンダー イベント参加ボタン
+#グループが行うイベントカレンダー イベント参加ボタン
 class GroupCalendar(GpEventCalView):
     pass
 
@@ -421,7 +421,7 @@ class GroupCalendar(GpEventCalView):
 class EventDetailView():
     pass
 
-class GroupJoinView(View):
+class GroupJoinView(View): #メンバー申請許可
     model=Group
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
@@ -440,7 +440,7 @@ class GroupJoinView(View):
         # return HttpResponseRedirect( reverse_lazy('group'))
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
-class GroupJoinStaffView(View):
+class GroupJoinStaffView(View): #スタッフ申請許可
     model=Group
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
@@ -458,7 +458,7 @@ class GroupJoinStaffView(View):
 
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
-class EventJoinView(View):
+class EventJoinView(View): #イベント予約
     model=Event
     def get(self, request, *args, **kwargs):
         event = Event.objects.get(id=self.kwargs['pk'])
