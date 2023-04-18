@@ -395,11 +395,14 @@ class GroupDetailCalView(mixins.MonthCalendarMixin, DetailView):
         event_data = Event.objects.filter(group=pk).order_by('event_date')#指定グループのイベントでフィルター
         days={event_days.event_date for event_days in event_data }
 
+        group_data = Group.objects.get(id=self.kwargs['pk'])
+
         context.update(calendar_context)
         context['event_data'] = event_data #イベントのデータをコンテキストで渡す
         context['days'] = days
         context['approved_check_s'] = approved_check_s
         print(approved_check_s)
+        context['group_data']=group_data
 
         return context
     
