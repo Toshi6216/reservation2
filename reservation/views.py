@@ -314,6 +314,46 @@ from django.db.models import Q
 class GpEventCalView(mixins.MonthCalendarMixin, generic.TemplateView):
     template_name = 'reservation/group_event_cal.html'
     model = Event
+    def get(self, request, *args, **kwargs):
+        print("getメソッド")
+        group_data = Group.objects.get(id=self.kwargs['pk'])
+        event_data = Event.objects.filter(group=group_data)
+        member_data = ApprovedMember.objects.filter( #memberデータ取得
+            group = group_data, approved = True)
+
+        staff_data = ApprovedStaff.objects.filter( #staffデータ取得
+            group = group_data, approved = True)
+
+        applying_staffs=ApplyingStaff.objects.filter(group=group_data, applying=True)
+        applying_members=ApplyingMember.objects.filter(group=group_data, applying=True)
+
+
+        member_names = {m_data.member for m_data in member_data}
+        print("member_names:",member_names)
+        staff_names = {s_data.staff for s_data in staff_data}
+        """グループ加入の承認済みデータのリストに名前があり、かつapprovedでないと別ページにリダイレクトされる"""
+        is_group_staff = self.request.user in staff_names
+        is_group_member = self.request.user in member_names
+
+   
+        ctx={
+                'group_data':group_data,
+                'member_data':member_data,
+                'member_names':member_names,
+                'staff_names':staff_names,
+                'event_data':event_data,
+                'is_group_staff':is_group_staff,
+                'is_group_member':is_group_member,
+                'applying_staffs':applying_staffs,
+                'applying_members':applying_members,
+
+            }
+
+        if (request.user in staff_names) or  (request.user in member_names):
+            return render(request, 'reservation/group_detail.html', ctx)
+        else:
+            return HttpResponse('<h1>%sさんは%sの詳細は見られません</h1>' % (request.user.nickname, group_data.group_name ))
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         calendar_context = self.get_month_calendar()
@@ -332,6 +372,37 @@ class GpEventCalView(mixins.MonthCalendarMixin, generic.TemplateView):
         context['days'] = days
         context['approved_check_s'] = approved_check_s
         print(approved_check_s)
+
+        return context
+    
+
+from django.db.models import Q
+#カレンダーと所属しているグループのイベントを表示
+class GroupDetailCalView(mixins.MonthCalendarMixin, DetailView):
+    template_name = 'reservation/group_detail_cal.html'
+    model = Group
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        calendar_context = self.get_month_calendar()
+        pk=self.object.pk
+
+        approved_check_m = ApprovedMember.objects.filter(member=self.request.user, approved = True)
+        approved_check_s = ApprovedStaff.objects.filter(staff=self.request.user, approved = True)
+
+        chk_m=[ap_chk_m.group for ap_chk_m in approved_check_m]
+        chk_s=[ap_chk_s.group for ap_chk_s in approved_check_s]
+        
+        event_data = Event.objects.filter(group=pk).order_by('event_date')#指定グループのイベントでフィルター
+        days={event_days.event_date for event_days in event_data }
+
+        group_data = Group.objects.get(id=self.kwargs['pk'])
+
+        context.update(calendar_context)
+        context['event_data'] = event_data #イベントのデータをコンテキストで渡す
+        context['days'] = days
+        context['approved_check_s'] = approved_check_s
+        print(approved_check_s)
+        context['group_data']=group_data
 
         return context
     
