@@ -2,21 +2,16 @@
 
 {% block content %}
 <h1>{{ group_data.group_name }} カレンダー</h1>
+<p><a class='btn btn-primary' href="{% url 'group_detail' group_data.pk %}">グループ詳細へ</a></p>
 <div class="row my-4 ">
-    <div class="col-md-5">
+    <div class="card col-md-5 my-2">
         <div class="card-body">
-            <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }} <a href="# " class="btn btn-danger">スタッフ申請</a></h4>
+            <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }} </h4><a href="# " class="btn btn-danger">スタッフ申請</a>
             <h5>グループオーナー：{{ group_data.group_owner.nickname }}</h5>
             <p class="card-text mb-3">{{ group_data.group_detail }}</p>
             
-            < class="list-group listgroup-flush mb-3">
-                <li class="list-group-item">
-                <p>【STAFF】</p>
-                    {% for s_name in staff_names %}
-                    {{s_name.nickname}} &ensp;
-                    {% endfor %}
-                </li>
-            
+            <ul class="list-group listgroup-flush ">
+
                 <li class="list-group-item">
                 <p>【MEMBER】</p>
                     {% for m_name in member_names %}
@@ -24,41 +19,7 @@
                     {% endfor %} 
                 </li> 
                 
-                {% if is_group_staff %} <!--staffでなければ表示しない-->
-                <li class="list-group-item">
-                <p>【STAFF申請中】</p> 
 
-                <form action="" method="POST">
-                    {% csrf_token %}
-                    {% for applying_s in applying_staffs %}
-                        <label><input type="checkbox" name="applying_staff" value="{{ applying_s.pk }}">{{ applying_s.staff.nickname }}({{ applying_s.staff.last_name }} {{ applying_s.staff.first_name }})</label>,
-                    
-                    {% endfor %}
-                    {% if group_data.applyingstaff_set.all %}
-                        <input type="submit" value="送信">
-                    {% endif %}
-
-                </form> 
-
-                </li>
-                <li class="list-group-item">
-                <p>【MEMBER申請中】</p>
-                <form action="" method="POST">
-                    {% csrf_token %}
-
-                    {% for applying_m in applying_members %}
-                    <label><input type="checkbox" name="applying_member" value="{{ applying_m.pk }}">{{ applying_m.member.nickname }}({{ applying_m.member.last_name }} {{ applying_m.member.first_name }})</label>,
-
-                    {% endfor %}
-
-                    {% if group_data.applyingmember_set.all %}
-                        <input type="submit" value="送信">
-                    {% endif %}
-
-                </form>
-
-                </li>
-                {% endif %} 
                 <li class="list-group-item">
                 <p>【EVENT】</p>
                     {% for event in event_data %}
@@ -74,10 +35,10 @@
 
     <div class="col-md-7">
 
-        <a class="btn btn-warning" href="{% url 'gp_event_cal' %}">今月</a>
-        <a class="btn btn-primary" href="{% url 'gp_event_cal' month_previous.year month_previous.month %}">前月</a>
+        <a class="btn btn-warning" href="{% url 'group_detail_cal' group_data.pk %}">今月</a>
+        <a class="btn btn-primary" href="{% url 'group_detail_cal' group_data.pk month_previous.year month_previous.month %}">前月</a>
     
-        <a class="btn btn-primary" href="{% url 'gp_event_cal' month_next.year month_next.month %}">次月</a>
+        <a class="btn btn-primary" href="{% url 'group_detail_cal' group_data.pk month_next.year month_next.month %}">次月</a>
         <h3>{{ month_current | date:"Y年m月" }}</h3>
 
         <div class="card border-info">
@@ -136,7 +97,7 @@
                 
                     <h5 class="card-title">#{{ event.id }}/{{ event.event_title }} <div class="date_class">{{event.event_date}}</div></h5>
                     <p>{{ event.start_time }}-{{ event.end_time }}</p>
-                    <p class="card-text ">{{ event.event_detail|truncatechars:100 }}</p>
+                    <p class="card-text ">{{ event.event_detail|truncatechars:20 }}</p>
                     
                     <p ><a href="{% url 'group_detail' event.group.pk  %} " class="btn btn-success">{{ event.group }}</a></p>
 
@@ -147,13 +108,7 @@
         {% endfor %}
     </div>  
  
-           </div> 
-        <div class="col-md-4">
-  
-            <div class="card">
-            <h5 class="card-header">group member...</h5>
-            </div>
-        </div> 
+
 
 
 {% endblock %}

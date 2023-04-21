@@ -2,7 +2,8 @@
 
 {% block content %}
     <div class="my-5">
-        <h1>group-detail!</h1>
+        <h1>グループ詳細</h1>
+        <p><a class='btn btn-primary' href="{% url 'group_detail_cal' group_data.pk %}">グループのカレンダーへ</a></p>
     </div>
 
     <div class="card mb-3 col-lg-auto" style="">
@@ -10,8 +11,9 @@
 
             <div class="col-md-8">
                 <div class="card-body">
-                    <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }} <a href="{% url 'group_join_staff' group_data.pk  %} " class="btn btn-danger">スタッフ申請</a></h4>
+                    <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>グループ名：{{ group_data.group_name }}</h4><p> <a href="{% url 'group_join_staff' group_data.pk  %} " class="btn btn-danger">スタッフ申請</a></p>
                     <h5>グループオーナー：{{ group_data.group_owner.nickname }}</h5>
+                    <p>グループの説明：</p>
                     <p class="card-text mb-3">{{ group_data.group_detail }}</p>
                     <ul class="list-group listgroup-flush mb-3">
                         <li class="list-group-item">
@@ -81,18 +83,20 @@
              <div class="card mb-3 col-lg-auto">
                 <div class="card-body">
                 
-                    <h5 class="card-title">#{{ event.id }}/{{ event.event_title }}</h5>
-                    <p>{{event.event_date}} {{ event.start_time }}-{{ event.end_time }}</p>
+                    <h5 class="card-title"><a href="{% url 'event_detail' event.pk %}"> #{{ event.pk }}/{{ event.event_title }}</a>
+                    </h5>
+                    <p>開催日時{{event.event_date}} {{ event.start_time }}-{{ event.end_time }}</p>
                     <p class="card-text">{{ event.event_detail|truncatechars:100 }}</p>
-                    {% if is_group_staff %}<!--staffでなければ表示しない-->
-                        <a href="{% url 'event_edit' event.pk  %} " class="btn btn-warning">event編集</a>
-                        <a href="{% url 'event_delete' event.pk %}" class="btn btn-danger">削除する</a>
-                    {% endif %}
+                    
                     {% if is_group_member %}<!---->
                        <p class="my-1">
                         <a href="{% url 'event_join' event.pk  %} " class="btn btn-success">event参加</a>
                        </p>
                         
+                    {% endif %}
+                    {% if is_group_staff %}<!--staffでなければ表示しない-->
+                        <a href="{% url 'event_edit' event.pk  %} " class="btn btn-warning">event編集</a>
+                        <a href="{% url 'event_delete' event.pk %}" class="btn btn-danger">削除する</a>
                     {% endif %}
                 </div>
 
