@@ -35,6 +35,7 @@
                             
                         <a href="{% url 'group_detail' group_m.group.pk  %} " class="btn btn-success">{{ group_m.group }}</a>
 
+
                         {% endfor %}
                         </td>
                     </tr>
@@ -78,8 +79,8 @@
                             {% csrf_token %}
                         {% for event in event_join %}
                             <p>
-                            <label><input type="checkbox" name="event_join" value="{{ event.pk }}">
-                            {{event.join_event.event_date}} {{ event.join_event }} (主催：{{ event.join_event.group }})</label>
+                            <label><input type="checkbox" name="event_join" value="{{ event.pk }}"><a href="{% url 'event_detail' event.join_event.pk %}">
+                            {{event.join_event.event_date}} {{ event.join_event }} (主催：{{ event.join_event.group }})</a></label>
                             </p>
                         {% endfor %}
                         {% if user.join_set.all %}

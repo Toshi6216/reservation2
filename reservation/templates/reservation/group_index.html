@@ -12,7 +12,7 @@
                 <div class="card-body">
                     <h5 class="card-title">#{{ group.id }}/{{ group.group_name }}</h5>
                     <p>グループオーナー：{{ group.group_owner.nickname }}</p>
-                    <p class="card-text">{{ group.group_detail|truncatechars:100 }}</p>
+                    <p class="card-text">{{ group.group_detail }}</p>
         
             <!--staffでなければ表示しない-->
                 {% if group.group_name in approvedmember_grouplist %}<!--メンバーなら表示-->

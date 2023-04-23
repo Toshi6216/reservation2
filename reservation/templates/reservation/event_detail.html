@@ -1,0 +1,49 @@
+{% extends 'reservation/base.html' %}
+
+{% block content %}
+
+    <div class="card card-profile my-5 mx-auto">
+        <div class="carl-body">
+            <h5 class="card-title text-center">イベント詳細</h5>
+            <table class="profile_table mb-4 ">
+                <tbody>
+                    <tr>
+                        <th class="header">イベントタイトル</th>
+                        <td class="data">{{ event.event_title }}</td>
+                    </tr>
+                    <tr>
+                        <th class="header">内容</th>
+                        <td class="data">{{ event.event_detail }}</td>
+                    </tr>
+                    <tr>
+                        <th class="header">開催日時</th>
+                        <td class="data">{{ event.start_time }}-{{ event.end_time }}</td>
+                    </tr>
+                    <tr>
+                        <th class="header">参加予定</th>
+                        <td class="data">
+                        
+                        {% for member in event.join_set.all %}
+                            {{ member.join_name.nickname }}
+                        {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+                <ul class="list-group">
+                
+                    <li class="list-group-item">
+
+                        <p>このイベントの参加予約をしますか？</p>
+                        <a href="{% url 'event_join' event.pk  %} " class="btn btn-success">event参加</a>
+
+                    </li>
+                </ul>
+            
+ 
+        </div>
+    </div>
+
+{% endblock %}
