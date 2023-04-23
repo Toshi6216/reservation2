@@ -489,6 +489,7 @@ class EventDetailView(DetailView):
     template_name = 'reservation/event_detail.html'
     def get(self, request, *args, **kwargs):
         event = Event.objects.get(id=self.kwargs['pk'])
+        
         return render(request, self.template_name,{
             'event': event
         })
