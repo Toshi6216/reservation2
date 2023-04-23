@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView, View, UpdateView, CreateView, DeleteView
 from django.views.generic.detail import DetailView
 
-from .models import Group, Event, ApprovedMember, ApprovedStaff, ApplyingMember, ApplyingStaff
+from .models import Group, Event, ApprovedMember, ApprovedStaff, ApplyingMember, ApplyingStaff, Join
 from .forms import EventForm, GroupForm
 from accounts.models import CustomUser
 from django.urls import reverse_lazy
@@ -45,16 +45,27 @@ class GroupView(View):
     #このviewがコールされたら最初にget関数が呼ばれる
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.order_by('-id') #新しいものから順番に並べる
-        for g in group_data:
-            print(g.group_owner.nickname)
+        # for g in group_data:
+        #     print(g.group_owner.nickname)
         user_data = CustomUser.objects.get(email=self.request.user)
-        member_data = ApprovedMember.objects.filter(member=request.user, 
-            group__in = group_data, approved = True)#memberデータ取得
+        member_data = ApprovedMember.objects.filter(
+            member=request.user, 
+            group__in = group_data, 
+            approved = True)#memberデータ取得
+        staff_data = ApprovedStaff.objects.filter(
+            staff=request.user, 
+            group__in = group_data, 
+            approved = True)#staffデータ取得
+        
         
         approvedmember_grouplist=[]
         for m_data in member_data:
             print(m_data.member,m_data.group, m_data.approved)
             approvedmember_grouplist.append(m_data.group.group_name)
+
+        approvedstaff_grouplist=[]
+        for s_data in staff_data:
+            approvedstaff_grouplist.append(s_data.group.group_name)
 
         print("*****")
         applyingmember_grouplist=[]
@@ -66,6 +77,7 @@ class GroupView(View):
             'group_data': group_data,
             'user_data': user_data,
             'approvedmember_grouplist': approvedmember_grouplist,
+            'approvedstaff_grouplist': approvedstaff_grouplist,
             'applyingmember_grouplist': applyingmember_grouplist,
 
         })
@@ -141,6 +153,11 @@ class GroupDetailView(DetailView):
         is_group_staff = self.request.user in staff_names
         is_group_member = self.request.user in member_names
 
+        join_event_list=[]
+        join_event=Join.objects.filter(join_name=self.request.user, join=True)
+        for j_ev in join_event:
+            join_event_list.append(j_ev.join_event.pk)
+        print(join_event_list)
    
         ctx={
                 'group_data':group_data,
@@ -152,6 +169,7 @@ class GroupDetailView(DetailView):
                 'is_group_member':is_group_member,
                 'applying_staffs':applying_staffs,
                 'applying_members':applying_members,
+                'join_event_list': join_event_list,
 
             }
 
@@ -376,7 +394,9 @@ class GroupDetailCalView(mixins.MonthCalendarMixin, DetailView):
         context['applying_staffs']=applying_staffs
         context['applying_members']=applying_members
 
-        if (request.user in staff_names) or  (request.user in member_names):
+        # if (request.user in staff_names) or  (request.user in member_names):
+        if is_group_member or is_group_staff :
+
             return  self.render_to_response(context)
 
         else:
@@ -490,8 +510,15 @@ class EventDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         event = Event.objects.get(id=self.kwargs['pk'])
         
+        is_join=False
+        for join_event in event.join_set.all():
+            print(join_event.join_name)
+            if self.request.user==join_event.join_name:
+                is_join=True
+       
         return render(request, self.template_name,{
-            'event': event
+            'event': event,
+            'is_join': is_join,
         })
 
 class GroupJoinView(View): #メンバー申請許可

@@ -17,12 +17,16 @@
                     </tr>
                     <tr>
                         <th class="header">開催日時</th>
-                        <td class="data">{{ event.start_time }}-{{ event.end_time }}</td>
+                        <td class="data">{{ event.event_date }}  {{ event.start_time }}-{{ event.end_time }}</td>
+                        
+
                     </tr>
                     <tr>
                         <th class="header">参加予定</th>
                         <td class="data">
-                        
+                        {% if not event.join_set.all %}
+                            参加予約なし
+                        {% endif %}
                         {% for member in event.join_set.all %}
                             {{ member.join_name.nickname }}
                         {% endfor %}
@@ -31,7 +35,7 @@
                 </tbody>
             </table>
 
-
+            {% if not is_join %}
                 <ul class="list-group">
                 
                     <li class="list-group-item">
@@ -41,7 +45,7 @@
 
                     </li>
                 </ul>
-            
+            {% endif %}
  
         </div>
     </div>

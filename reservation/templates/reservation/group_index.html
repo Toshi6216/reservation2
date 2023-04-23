@@ -15,12 +15,15 @@
                     <p class="card-text">{{ group.group_detail }}</p>
         
             <!--staffでなければ表示しない-->
-                {% if group.group_name in approvedmember_grouplist %}<!--メンバーなら表示-->
+                {% if group.group_name in approvedmember_grouplist  %}<!--メンバーなら表示-->
+
+                <p class=""><a href="{% url 'group_detail' group.pk  %} " class="btn btn-success">group詳細</a>
+
+                {% elif group.group_name in approvedstaff_grouplist  %}<!--メンバーなら表示-->
 
                 <p class=""><a href="{% url 'group_detail' group.pk  %} " class="btn btn-success">group詳細</a>
                 
                 {% endif %}
-        
 
 
       

@@ -22,7 +22,7 @@
                         <th class="header">所属(staff)</th>
                         <td class="data">
                         {% for group_s in group_data_s %}
-                        <a href="{% url 'group_detail' group_s.group.pk  %} " class="btn btn-success">{{ group_s.group }}</a>
+                        <a href="{% url 'group_detail' group_s.group.pk  %} " class="btn btn-success my-1">{{ group_s.group }}</a>
 
                         {% endfor %}
                         </td>
@@ -33,7 +33,7 @@
                         <td class="data">
                         {% for group_m in group_data_m %}
                             
-                        <a href="{% url 'group_detail' group_m.group.pk  %} " class="btn btn-success">{{ group_m.group }}</a>
+                        <a href="{% url 'group_detail' group_m.group.pk  %} " class="btn btn-success my-1">{{ group_m.group }}</a>
 
 
                         {% endfor %}
@@ -50,7 +50,7 @@
                         {{ applying_s.group }}</label>,
                         {% endfor %}
                         {% if user.applyingstaff_set.all %}
-                        <p><input type="submit" value="申請中止" class="btn btn-warning"></p>
+                        <p><input type="submit" value="申請中止" class="btn btn-warning my-1"></p>
                         {% endif %}
                         </form>
 
@@ -67,7 +67,7 @@
                         {{ applying_m.group }}</label>,
                         {% endfor %}
                         {% if user.applyingmember_set.all %}
-                        <p><input type="submit" value="申請中止" class="btn btn-warning"></p>
+                        <p><input type="submit" value="申請中止" class="btn btn-warning my-1"></p>
                         {% endif %}
                         </form>
                         </td>
@@ -84,7 +84,7 @@
                             </p>
                         {% endfor %}
                         {% if user.join_set.all %}
-                        <p><input type="submit" value="予約中止" class="btn btn-warning"></p>
+                        <p><input type="submit" value="予約中止" class="btn btn-warning my-1"></p>
                         {% endif %}
                         </form>
                         </td>
@@ -92,7 +92,7 @@
                 </tbody>
             </table>
             <div class="button my-3 mx-auto">
-                <a href="{% url 'userprofile_form' user.pk %}" class="btn btn-lg btn-warning btn-block">編集する</a>
+                <a href="{% url 'userprofile_form' user.pk %}" class="btn btn-lg btn-warning btn-block my-1">編集する</a>
             </div>
         </div>
     </div>
