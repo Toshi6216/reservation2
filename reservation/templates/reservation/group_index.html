@@ -4,6 +4,17 @@
     <div class="my-5">
         <h1>group!</h1>
     </div>
+    {% if searchForm %} <!-- searchFormがあれば -->
+        <form action="{% url 'group' %}" method="get">
+            <div >
+            {{ searchForm }}
+            <input type="submit" value="検索">
+            <a href="{% url 'group' %}"> クリア </a>
+            </div>
+        </form>
+    {% endif %}
+
+
     <div class="card-deck d-flex flex-wrap" >
     {% for group in group_data %}
 

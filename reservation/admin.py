@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import *
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('event_title', 'group', 'event_date', 'start_time', 'end_time')
+    list_display = ('pk','event_title', 'group', 'event_date', 'start_time', 'end_time')
 
 class ApplyingMemberAdmin(admin.ModelAdmin):
     list_display = ('pk', 'member', 'group', 'applying')
