@@ -23,7 +23,7 @@
                 <li class="list-group-item">
                 <p>【EVENT】</p>
                     {% for event in event_data %}
-                    {{ event.event_title }} &ensp;
+                    <p>{{ event.event_title }}({{ event.event_date }})</p>
                     {% endfor %} 
                 </li>
             </ul> 

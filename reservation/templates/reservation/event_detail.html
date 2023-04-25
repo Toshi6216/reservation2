@@ -28,7 +28,7 @@
                             参加予約なし
                         {% endif %}
                         {% for member in event.join_set.all %}
-                            {{ member.join_name.nickname }}
+                            {{ member.join_name.nickname }},
                         {% endfor %}
                         </td>
                     </tr>

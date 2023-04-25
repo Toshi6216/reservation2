@@ -3,16 +3,16 @@
 {% block content %}
 
     <div class="my-5">
-        <h1>event!</h1>
+        <h3>参加予約</h3>
     </div>
-    {% comment %} {% extends 'reservation/month.html' %} {% endcomment %}
+  
     <div class="card mb-3 col-lg-auto" style="">
         <div class="row no-gutters">
 
             <div class="col-md-8">
                 <div class="card-body">
                 <ul>
-                    <li>
+                    <li class="list-group-item">
                         <h5 class="card-title">#{{ event.id }}/{{ event.event_title }}</h5>
                         <p class="card-text">{{ event.event_detail }}</p>
                     </li>
