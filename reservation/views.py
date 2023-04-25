@@ -58,7 +58,7 @@ class GroupView(View):
             approved = True)#staffデータ取得
         #グループ検索機能
         searchForm = SearchForm(self.request.GET)
-        print("searchForm:", searchForm)
+        # print("searchForm:", searchForm)
         #seachForm変数に正常なデータがあれば
         if searchForm.is_valid():
             keyword = searchForm.cleaned_data['keyword'] #keyword変数にフォームのキーワードを代入
@@ -66,19 +66,19 @@ class GroupView(View):
         else:
             keyword = SearchForm()
             group_data = Group.objects.order_by('-id') #新しいものから順番に並べる
-            print("if else")
+            # print("if else")
 
         
         approvedmember_grouplist=[]
         for m_data in member_data:
-            print(m_data.member,m_data.group, m_data.approved)
+            # print(m_data.member,m_data.group, m_data.approved)
             approvedmember_grouplist.append(m_data.group.group_name)
 
         approvedstaff_grouplist=[]
         for s_data in staff_data:
             approvedstaff_grouplist.append(s_data.group.group_name)
 
-        print("*****")
+        # print("*****")
         applyingmember_grouplist=[]
         for apl_m_data in ApplyingMember.objects.filter(member=request.user,group__in=group_data, applying=True):
             print(apl_m_data.member,apl_m_data.group, apl_m_data.applying)
@@ -169,7 +169,7 @@ class GroupDetailView(DetailView):
         join_event=Join.objects.filter(join_name=self.request.user, join=True)
         for j_ev in join_event:
             join_event_list.append(j_ev.join_event.pk)
-        print(join_event_list)
+        # print(join_event_list)
    
         ctx={
                 'group_data':group_data,
@@ -198,7 +198,7 @@ class GroupDetailView(DetailView):
         group = self.get_object()
         pk= group.pk
 
-        print(request.POST)
+        # print(request.POST)
         if 'applying_staff' in request.POST:#スタッフの加入許可の処理
             applying_staff_pks = request.POST.getlist('applying_staff')
             # print(applying_staff_pks, applying_member_pks)
@@ -488,7 +488,7 @@ class EventDeleteView(View):
     def post(self, request, *args, **kwargs):
         event_data = Event.objects.get(id=self.kwargs['pk'])
         pk = event_data.group.pk
-        print(pk)
+        # print(pk)
         event_data.delete()
         #削除したイベントのグループページに遷移
         return HttpResponseRedirect( reverse_lazy('group_detail', kwargs={'pk':pk}))
@@ -533,7 +533,7 @@ class EventDetailView(DetailView):
             'is_join': is_join,
         })
 
-class GroupJoinView(View): #メンバー申請許可
+class GroupJoinView(View): #メンバー申請
     model=Group
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
@@ -547,12 +547,12 @@ class GroupJoinView(View): #メンバー申請許可
         user_data = CustomUser.objects.get(email=self.request.user)
         user_data.applyingmember_set.create(member=self.request.user, group=group_data, applying=True)
         pk=user_data.pk
-        print(pk)
+        # print(pk)
         #グループページに遷移
         # return HttpResponseRedirect( reverse_lazy('group'))
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
-class GroupJoinStaffView(View): #スタッフ申請許可
+class GroupJoinStaffView(View): #スタッフ申請
     model=Group
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
@@ -566,7 +566,7 @@ class GroupJoinStaffView(View): #スタッフ申請許可
         user_data = CustomUser.objects.get(email=self.request.user)
         user_data.applyingstaff_set.create(staff=self.request.user, group=group_data, applying=True)
         pk=user_data.pk
-        print(pk)
+        # print(pk)
 
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
@@ -585,7 +585,7 @@ class EventJoinView(View): #イベント予約
         user_data.join_set.create(join_name=self.request.user, join_event=event, join=True)
         # pk=user_data.pk
         pk=event.group.pk
-        print(pk)
+        # print(pk)
         
         # return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
         return HttpResponseRedirect( reverse_lazy('group_detail', kwargs={'pk':pk}))
