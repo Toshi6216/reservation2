@@ -8,6 +8,10 @@
             <table class="profile_table mb-4 ">
                 <tbody>
                     <tr>
+                        <th class="header">主催</th> <!-- グループ名表示・リンク追記 -->
+                        <td class="data"><a href="{% url 'group_detail_cal' event.group.pk  %} " >{{ event.group }}</a></td>
+                    </tr>
+                    <tr>
                         <th class="header">イベントタイトル</th>
                         <td class="data">{{ event.event_title }}</td>
                     </tr>

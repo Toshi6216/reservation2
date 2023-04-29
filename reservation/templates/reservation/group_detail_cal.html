@@ -23,7 +23,7 @@
                 <li class="list-group-item">
                 <p>【EVENT】</p>
                     {% for event in event_data %}
-                    <p>{{ event.event_title }}({{ event.event_date }})</p>
+                    <p><a href="{% url 'event_detail' event.pk %}">{{ event.event_title }}({{ event.event_date }})</a></p> <!-- イベント詳細へのリンク追加 -->
                     {% endfor %} 
                 </li>
             </ul> 

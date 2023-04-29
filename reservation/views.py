@@ -22,6 +22,8 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db import transaction
+from django.conf import settings
+from django.core.mail import BadHeaderError, send_mail
 
 # from dateutil.relativedelta import relativedelta 
 
@@ -37,7 +39,6 @@ class EventView(View):
         return render(request, 'reservation/event_index.html',{
             'event_data': event_data
         })
-                # 'is_group_staff':is_group_staff
     
 
 #グループ一覧
@@ -545,11 +546,29 @@ class GroupJoinView(View): #メンバー申請
     def post(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
         user_data = CustomUser.objects.get(email=self.request.user)
-        user_data.applyingmember_set.create(member=self.request.user, group=group_data, applying=True)
-        pk=user_data.pk
         # print(pk)
         #グループページに遷移
         # return HttpResponseRedirect( reverse_lazy('group'))
+
+        #メール送信用データ生成######
+        subject = "グループ加入申請(member)"
+        message = "「{}」に、".format(group_data.group_name) + "{0}({1})がメンバー申請しました。\n".format(user_data, user_data.nickname) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
+        sender = settings.EMAIL_HOST_USER
+
+        group_staff_query = group_data.approvedstaff_set.all()
+        # print("group_staff_query:", group_staff_query)
+        recipients = []
+        for gp in group_staff_query:
+            group = gp.staff.email
+            # print(group.staff)
+            recipients.append(group)
+        # print("send_mail:", subject, message, sender, recipients)
+        #メール送信用データ生成(ここまで)######
+       
+        user_data.applyingmember_set.create(member=self.request.user, group=group_data, applying=True)
+        pk=user_data.pk
+        send_mail(subject, message, sender, recipients) #通知メール送信
+    
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
 class GroupJoinStaffView(View): #スタッフ申請

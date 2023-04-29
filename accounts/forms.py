@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserCreationForm
 from allauth.account.forms import SignupForm
+from django.contrib.auth import get_user_model
 
-from .models import CustomUser
+# from .models import CustomUser
+CustomUser = get_user_model() #正式なユーザーデータ取得の仕方に変更
 
 class ProfileForm(forms.ModelForm):
     class Meta:
