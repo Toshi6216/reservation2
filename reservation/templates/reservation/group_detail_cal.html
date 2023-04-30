@@ -19,11 +19,13 @@
                     {% endfor %} 
                 </li> 
                 
-
+<input type="hidden" id="redirect-url" value="{% url 'group_detail_cal' group_data.pk %}">
                 <li class="list-group-item">
                 <p>【EVENT】</p>
                     {% for event in event_data %}
-                    <p><a href="{% url 'event_detail' event.pk %}">{{ event.event_title }}({{ event.event_date }})</a></p> <!-- イベント詳細へのリンク追加 -->
+                    <p><a href="{% url 'event_detail' event.pk %}">{{ event.event_title }}({{ event.event_date }})</a><button class="btn btn-success" onclick="highlightDay('{{ event.event_date }}', '{{ event.group.pk }}', '{{ month_current }}')">表示</button>
+                    </p> <!-- イベント詳細へのリンク追加 -->
+                   
                     {% endfor %} 
                 </li>
             </ul> 
@@ -88,11 +90,15 @@
 
     <div class="card-deck d-flex flex-wrap" >
         {% for event in event_data %}
-            {% if now == event.event_date %}
+            {% comment %} {% if now == event.event_date %}
             <div class="active_event card border-info event_card {{event.event_date}}" style="width:20rem;">
             {% else %}
             <div class="event_hide card border-info event_card {{event.event_date}}" style="width:20rem;">
-            {% endif %}
+            {% endif %} {% endcomment %}
+
+            <div class="event_hide card border-info event_card {{event.event_date}}" style="width:20rem;">
+
+
                 <div class="card-body ">
                 
                     <h5 class="card-title">#{{ event.id }}/{{ event.event_title }} <div class="date_class">{{event.event_date}}</div></h5>
