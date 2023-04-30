@@ -85,10 +85,11 @@
 
                 </table>
         </div>
-    </div>
     
 
-    <div class="card-deck d-flex flex-wrap" >
+    {% comment %} <div class="card-deck d-flex flex-wrap" > {% endcomment %}
+    <div class="card border-info" >
+
         {% for event in event_data %}
             {% comment %} {% if now == event.event_date %}
             <div class="active_event card border-info event_card {{event.event_date}}" style="width:20rem;">
@@ -96,8 +97,10 @@
             <div class="event_hide card border-info event_card {{event.event_date}}" style="width:20rem;">
             {% endif %} {% endcomment %}
 
-            <div class="event_hide card border-info event_card {{event.event_date}}" style="width:20rem;">
+            {% comment %} <div class="col-md-7 event_hide card border-info event_card {{event.event_date}}" style="width:25rem;">  {% endcomment %}
+            <div class="col-md-7 card-body event_hide event_card {{event.event_date}}" "> 
 
+    
 
                 <div class="card-body ">
                 
@@ -112,6 +115,7 @@
         
             </div>  
         {% endfor %}
+    </div>
     </div>  
  
 
