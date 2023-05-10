@@ -1,9 +1,27 @@
 from django.contrib import admin
 from .models import CustomUser, StaffUser, MemberUser
 
-class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'email', 'nickname')
 
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'email', 'nickname', 'first_name', 'last_name')
+
+    # list_filter = (
+    #     "nickname",
+    #     "admin",
+    #     "active",
+
+    # )
+    ordering = ("email",)
+    search_fields = ('email','nickname', 'first_name', 'last_name',)
+    filter_horizontal = ()
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2')}
+        ),
+    )
+    
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(StaffUser)
 admin.site.register(MemberUser)

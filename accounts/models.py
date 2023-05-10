@@ -6,6 +6,7 @@ from django.utils import timezone
 
 
 
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 

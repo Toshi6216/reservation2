@@ -25,6 +25,7 @@ from django.db import transaction
 from django.conf import settings
 from django.core.mail import BadHeaderError, send_mail
 
+
 # from dateutil.relativedelta import relativedelta 
 
 #homeページ
@@ -379,7 +380,7 @@ class GroupDetailCalView(mixins.MonthCalendarMixin, DetailView):
         self.object=self.get_object()
         context = self.get_context_data(object=self.object)
         group_data = Group.objects.get(id=self.kwargs['pk'])
-        event_data = Event.objects.filter(group=group_data)
+        event_data = Event.objects.filter(group=group_data).order_by('event_date')
         member_data = ApprovedMember.objects.filter( #memberデータ取得
             group = group_data, approved = True)
 
@@ -553,21 +554,28 @@ class GroupJoinView(View): #メンバー申請
         #メール送信用データ生成######
         subject = "グループ加入申請(member)"
         message = "「{}」に、".format(group_data.group_name) + "{0}({1})がメンバー申請しました。\n".format(user_data, user_data.nickname) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
+
         sender = settings.EMAIL_HOST_USER
 
         group_staff_query = group_data.approvedstaff_set.all()
         # print("group_staff_query:", group_staff_query)
         recipients = []
         for gp in group_staff_query:
-            group = gp.staff.email
-            # print(group.staff)
-            recipients.append(group)
+            group_send_to = gp.staff.email
+            recipients.append(group_send_to)
+        # send_mail(subject, message, sender, recipients) #通知メール送信
         # print("send_mail:", subject, message, sender, recipients)
         #メール送信用データ生成(ここまで)######
+        try:
+            send_mail(subject, message, sender, recipients) #通知メール送信
+            print("send_mail:", subject, message, sender, recipients)
+            
+        except BadHeaderError:
+            return HttpResponse('無効なヘッダーが見つかりました。')
        
         user_data.applyingmember_set.create(member=self.request.user, group=group_data, applying=True)
         pk=user_data.pk
-        send_mail(subject, message, sender, recipients) #通知メール送信
+        
     
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
@@ -583,9 +591,31 @@ class GroupJoinStaffView(View): #スタッフ申請
     def post(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
         user_data = CustomUser.objects.get(email=self.request.user)
+
+        #メール送信用データ生成######
+        subject = "グループ加入申請(staff)"
+        message = "「{}」に、".format(group_data.group_name) + "{0}({1})がスタッフ申請しました。\n".format(user_data, user_data.nickname) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
+
+        sender = settings.EMAIL_HOST_USER
+
+        group_staff_query = group_data.approvedstaff_set.all()
+        # print("group_staff_query:", group_staff_query)
+        recipients = []
+        for gp in group_staff_query:
+            group_send_to = gp.staff.email
+            recipients.append(group_send_to)
+        # send_mail(subject, message, sender, recipients) #通知メール送信
+        # print("send_mail:", subject, message, sender, recipients)
+        #メール送信用データ生成(ここまで)######
+        try:
+            send_mail(subject, message, sender, recipients) #通知メール送信
+            print("send_mail:", subject, message, sender, recipients)
+            
+        except BadHeaderError:
+            return HttpResponse('無効なヘッダーが見つかりました。')
+
         user_data.applyingstaff_set.create(staff=self.request.user, group=group_data, applying=True)
         pk=user_data.pk
-        # print(pk)
 
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
@@ -608,4 +638,41 @@ class EventJoinView(View): #イベント予約
         
         # return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
         return HttpResponseRedirect( reverse_lazy('group_detail', kwargs={'pk':pk}))
-    
+ 
+
+#以下お試し
+from .forms import ContactForm # 追加
+
+""" お問い合わせフォーム画面"""
+def contact_form(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            sender = settings.EMAIL_HOST_USER
+            send_to = form.cleaned_data['send_to']
+            myself = form.cleaned_data['myself']
+            recipients = []
+            recipients.append(send_to)
+           
+            if myself:
+                recipients.append(sender)
+            try:
+                send_mail(subject, message, sender, recipients)
+                print("send_mail:", subject, message, sender, recipients)
+                
+                
+            except BadHeaderError:
+                return HttpResponse('無効なヘッダーが見つかりました。')
+            return redirect('complete')
+
+    else:
+        form = ContactForm()
+    return render(request, 'contact/contact_form.html', {'form': form})
+
+
+""" 送信完了画面"""
+def complete(request):
+    return render(request, 'contact/complete.html')
