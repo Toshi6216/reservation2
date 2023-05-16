@@ -42,7 +42,7 @@ except ImportError:
     from django.core.management.utils import get_random_secret_key
     SECRET_KEY = get_random_secret_key()
     ALLOWED_HOSTS = ['.pythonanywhere.com']
-    # FRONTEND_URL = 'http://###/accounts/login/?next=/'
+    FRONTEND_URL = 'http://TestApp0123.pythonanywhere.com/accounts/login/?next=/'
 
 
 # Application definition
