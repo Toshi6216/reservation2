@@ -1,0 +1,121 @@
+{% extends 'reservation/base.html' %}
+
+{% block content %}
+    <div class="my-5">
+        <h3>グループ詳細</h3>
+        <p><a class='btn btn-primary' href="{% url 'group_detail_cal' group_data.pk %}">グループのカレンダーへ</a></p>
+    </div>
+
+    <div class="card mb-3 col-lg-auto" style="">
+
+        <div class="card-body">
+            <div class="card mb-3 col-lg-auto" style="">
+
+                <div class="card-body">
+
+                    <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>グループ名：{{ group_data.group_name }}</h4>
+                    {% if not is_group_staff %}
+                    <p> <a href="{% url 'group_join_staff' group_data.pk  %} " class="btn btn-danger">スタッフ申請</a></p>
+                    {% endif %}
+                    <h5>グループオーナー：{{ group_data.group_owner.nickname }}</h5>
+                    <p>グループの説明：</p>
+                    <div class="card-body mb-3 col-lg-auto">
+                        <p class="card-text mb-3">{{ group_data.group_detail }}</p>
+                    </div>
+                </div>
+            </div>
+
+                    <ul class="list-group listgroup-flush mb-3">
+                        <li class="list-group-item">
+                        <p>【STAFF】</p>
+                            {% for s_name in staff_names %}
+                            {{s_name.nickname}} &ensp;
+                            {% endfor %}
+                        </li>
+                        <li class="list-group-item">
+                        <p>【MEMBER】</p>
+                            {% for m_name in member_names %}
+                            {{ m_name.nickname }} &ensp;
+                            {% endfor %} 
+                        </li>
+                        
+                        {% if is_group_staff %} <!--staffでなければ表示しない-->
+                        <li class="list-group-item">
+                        <p>【STAFF申請中】</p>
+
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            {% for applying_s in applying_staffs %}
+                                <label><input type="checkbox" name="applying_staff" value="{{ applying_s.pk }}">{{ applying_s.staff.nickname }}({{ applying_s.staff.last_name }} {{ applying_s.staff.first_name }})</label>,
+                            
+                            {% endfor %}
+                            {% if group_data.applyingstaff_set.all %}
+                                <input type="submit" value="送信">
+                            {% endif %}
+
+                        </form>
+
+                        </li>
+                        <li class="list-group-item">
+                        <p>【MEMBER申請中】</p>
+                        <form action="" method="POST">
+                            {% csrf_token %}
+
+                            {% for applying_m in applying_members %}
+                            <label><input type="checkbox" name="applying_member" value="{{ applying_m.pk }}">{{ applying_m.member.nickname }}({{ applying_m.member.last_name }} {{ applying_m.member.first_name }})</label>,
+
+                            {% endfor %}
+
+                            {% if group_data.applyingmember_set.all %}
+                                <input type="submit" value="送信">
+                            {% endif %}
+
+                        </form>
+
+                        </li>
+                        {% endif %}
+                        <li class="list-group-item">
+                        <p>【EVENT】</p>
+                            {% for event in event_data %}
+                            {{ event.event_title }}({{ event.event_date }}) 
+                             &ensp;
+                             
+                            {% endfor %} 
+                        </li>
+                    </ul>
+                    {% if is_group_staff %} <!--staffでなければ表示しない-->
+                        <a href="{% url 'group_edit' group_data.pk  %} " class="btn btn-danger mb-3">group編集</a><a href="{% url 'event_new' group_data.pk  %} " class="btn btn-primary mb-3">event作成</a>
+                    {% endif %}
+        </div>
+                      
+    </div>
+
+    {% for event in event_data %}
+             <div class="card mb-3 col-lg-auto">
+                <div class="card-body">
+                
+                    <h5 class="card-title"><a href="{% url 'event_detail' event.pk %}"> #{{ event.pk }}/{{ event.event_title }}</a>
+                    </h5>
+                    <p>開催日時{{event.event_date}} {{ event.start_time }}-{{ event.end_time }}</p>
+                    <p class="card-text">{{ event.event_detail|truncatechars:100 }}</p>
+                    
+                    {% if not event.pk in join_event_list %}<!---->
+                       <p class="my-1">
+                        <a href="{% url 'event_join' event.pk  %} " class="btn btn-success">event参加</a>
+                       </p>
+                        
+                    {% endif %}
+
+
+
+                    {% if is_group_staff %}<!--staffでなければ表示しない-->
+                        <a href="{% url 'event_edit' event.pk  %} " class="btn btn-warning">event編集</a>
+                        <a href="{% url 'event_delete' event.pk %}" class="btn btn-danger">削除する</a>
+                    {% endif %}
+                </div>
+
+        
+            </div>  
+        {% endfor %}
+
+{% endblock %}

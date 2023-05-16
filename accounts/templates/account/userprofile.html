@@ -22,7 +22,7 @@
                         <th class="header">所属(staff)</th>
                         <td class="data">
                         {% for group_s in group_data_s %}
-                        <a href="{% url 'group_detail' group_s.group.pk  %} " class="btn btn-success my-1">{{ group_s.group }}</a>
+                        <a href="{% url 'group_detail_cal' group_s.group.pk  %} " class="btn btn-success my-1">{{ group_s.group }}</a>
 
                         {% endfor %}
                         </td>
@@ -33,7 +33,7 @@
                         <td class="data">
                         {% for group_m in group_data_m %}
                             
-                        <a href="{% url 'group_detail' group_m.group.pk  %} " class="btn btn-success my-1">{{ group_m.group }}</a>
+                        <a href="{% url 'group_detail_cal' group_m.group.pk  %} " class="btn btn-success my-1">{{ group_m.group }}</a>
 
 
                         {% endfor %}

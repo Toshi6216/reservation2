@@ -93,7 +93,7 @@
 
     <div class="card col-md-5 my-2">
         <div class="card-body">
-            <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }} </h4><a href="{% url 'group_join_staff' group_data.pk  %} " class="btn btn-danger">スタッフ申請</a>
+            <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }} </h4><a href="{% url 'group_join_staff' group_data.pk  %}" class="btn btn-danger">スタッフ申請</a>
             <h5>グループオーナー：{{ group_data.group_owner.nickname }}</h5>
             <p class="card-text mb-3">{{ group_data.group_detail }}</p>
             

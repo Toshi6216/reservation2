@@ -33,7 +33,7 @@ class IndexView(TemplateView):
     template_name = 'reservation/index.html'
     
 #イベント一覧
-class EventView(View):
+class EventView(LoginRequiredMixin,View):
     #このviewがコールされたら最初にget関数が呼ばれる
     def get(self, request, *args, **kwargs):
         event_data = Event.objects.order_by('-id') #新しいものから順番に並べる
@@ -43,7 +43,7 @@ class EventView(View):
     
 
 #グループ一覧
-class GroupView(View):
+class GroupView(LoginRequiredMixin,View):
     #このviewがコールされたら最初にget関数が呼ばれる
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.order_by('-id') #新しいものから順番に並べる
@@ -83,7 +83,7 @@ class GroupView(View):
         # print("*****")
         applyingmember_grouplist=[]
         for apl_m_data in ApplyingMember.objects.filter(member=request.user,group__in=group_data, applying=True):
-            print(apl_m_data.member,apl_m_data.group, apl_m_data.applying)
+            # print(apl_m_data.member,apl_m_data.group, apl_m_data.applying)
             applyingmember_grouplist.append(apl_m_data.group.group_name)
 
         return render(request, 'reservation/group_index.html',{
@@ -98,7 +98,7 @@ class GroupView(View):
 
 
 #イベント編集
-class EventEditView(UpdateView):
+class EventEditView(LoginRequiredMixin,UpdateView):
     model = Event
     template_name = 'reservation/event_form.html'
     form_class = EventForm
@@ -121,7 +121,7 @@ class EventEditView(UpdateView):
 
 
 #グループ内容編集
-class GroupEditView(UpdateView):
+class GroupEditView(LoginRequiredMixin,UpdateView):
     model = Group
     template_name = 'reservation/group_form.html'
     form_class = GroupForm
@@ -141,13 +141,13 @@ class GroupEditView(UpdateView):
 
 
 #グループ詳細
-class GroupDetailView(DetailView):
+class GroupDetailView(LoginRequiredMixin,DetailView):
 
     model=Group
     template_name = 'reservation/group_detail.html'
 
     def get(self, request, *args, **kwargs):
-        print("getメソッド")
+        # print("getメソッド")
         group_data = Group.objects.get(id=self.kwargs['pk'])
         event_data = Event.objects.filter(group=group_data)
         member_data = ApprovedMember.objects.filter( #memberデータ取得
@@ -161,7 +161,7 @@ class GroupDetailView(DetailView):
 
 
         member_names = {m_data.member for m_data in member_data}
-        print("member_names:",member_names)
+        # print("member_names:",member_names)
         staff_names = {s_data.staff for s_data in staff_data}
         """グループ加入の承認済みデータのリストに名前があり、かつapprovedでないと別ページにリダイレクトされる"""
         is_group_staff = self.request.user in staff_names
@@ -226,7 +226,7 @@ class GroupDetailView(DetailView):
 
             # print("staff_pks:", staff_pks)
             # if 'applying_staff' in request.POST:
-            print('applying_staff')
+            # print('applying_staff')
             try:
                 with transaction.atomic():
                     
@@ -295,7 +295,7 @@ class GroupDetailView(DetailView):
 
             return HttpResponseRedirect( reverse_lazy('group_detail', kwargs={'pk':pk}))
 
-            return redirect('group_detail', pk=pk)
+            # return redirect('group_detail', pk=pk)
         
 #グループ詳細
 # from django.views.generic.detail import DetailView
@@ -327,9 +327,11 @@ class GroupDetailView(DetailView):
 
 #         return context
 
+class LoginMixinTemplateView(LoginRequiredMixin, generic.TemplateView):
+    pass
 
 #カレンダーと全てのイベントを表示(使用しない)
-class EventCalView(mixins.MonthCalendarMixin, generic.TemplateView):
+class EventCalView(mixins.MonthCalendarMixin, LoginMixinTemplateView):
     template_name = 'reservation/event_cal.html'
     model = Event
     def get_context_data(self, **kwargs):
@@ -343,7 +345,7 @@ class EventCalView(mixins.MonthCalendarMixin, generic.TemplateView):
 
 from django.db.models import Q
 #カレンダーと所属しているグループのイベントを表示
-class GpEventCalView(mixins.MonthCalendarMixin, generic.TemplateView):
+class GpEventCalView(mixins.MonthCalendarMixin, LoginMixinTemplateView):
     template_name = 'reservation/group_event_cal.html'
     model = Event
    
@@ -365,18 +367,20 @@ class GpEventCalView(mixins.MonthCalendarMixin, generic.TemplateView):
         context['event_data'] = event_data #イベントのデータをコンテキストで渡す
         context['days'] = days
         context['approved_check_s'] = approved_check_s
-        print(approved_check_s)
+        # print(approved_check_s)
 
         return context
     
+class LoginMixinDetailView(LoginRequiredMixin, DetailView):
+    pass
 
 from django.db.models import Q
 #カレンダーと所属しているグループのイベントを表示
-class GroupDetailCalView(mixins.MonthCalendarMixin, DetailView):
+class GroupDetailCalView(mixins.MonthCalendarMixin, LoginMixinDetailView):
     template_name = 'reservation/group_detail_cal.html'
     model = Group
     def get(self, request, *args, **kwargs):
-        print("getメソッド")
+        # print("getメソッド")
         self.object=self.get_object()
         context = self.get_context_data(object=self.object)
         group_data = Group.objects.get(id=self.kwargs['pk'])
@@ -392,7 +396,7 @@ class GroupDetailCalView(mixins.MonthCalendarMixin, DetailView):
 
 
         member_names = {m_data.member for m_data in member_data}
-        print("member_names:",member_names)
+        # print("member_names:",member_names)
         staff_names = {s_data.staff for s_data in staff_data}
         """グループ加入の承認済みデータのリストに名前があり、かつapprovedでないと別ページにリダイレクトされる"""
         is_group_staff = self.request.user in staff_names
@@ -436,7 +440,7 @@ class GroupDetailCalView(mixins.MonthCalendarMixin, DetailView):
         context['event_data'] = event_data #イベントのデータをコンテキストで渡す
         context['days'] = days
         context['approved_check_s'] = approved_check_s
-        print(approved_check_s)
+        # print(approved_check_s)
         context['group_data']=group_data
 
         return context
@@ -452,7 +456,7 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
     def get(self, request, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
-        print(group_data)
+        # print(group_data)
         staff_data = ApprovedStaff.objects.filter(
             group = group_data, approved=True)
 
@@ -477,12 +481,28 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         
         obj.save()
         return super().form_valid(form)
-    
+
+class LoginMixinView(LoginRequiredMixin, View):
+    pass
+
 #イベント削除
-class EventDeleteView(View):
+class EventDeleteView(LoginMixinView):
 
     def get(self, request, *args, **kwargs):
         event_data = Event.objects.get(id=self.kwargs['pk'])
+
+        # print(event_data.group.id)
+        group_data = Group.objects.get(id=event_data.group.id)
+        print(group_data)
+
+        staff_data = ApprovedStaff.objects.filter(
+            group = group_data, approved=True)
+
+        names = [data.staff for data in staff_data] 
+        #スタッフユーザーで無ければHTMLを返す　遷移させる
+        if not request.user in names:
+            return HttpResponse('<h1>%sさんは%sの編集権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
+
         return render(request, 'reservation/event_delete.html',{
             'event_data': event_data
         })
@@ -526,7 +546,7 @@ class EventDetailView(DetailView):
         
         is_join=False
         for join_event in event.join_set.all():
-            print(join_event.join_name)
+            # print(join_event.join_name)
             if self.request.user==join_event.join_name:
                 is_join=True
        
@@ -535,7 +555,7 @@ class EventDetailView(DetailView):
             'is_join': is_join,
         })
 
-class GroupJoinView(View): #メンバー申請
+class GroupJoinView(LoginMixinView): #メンバー申請
     model=Group
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
@@ -568,7 +588,7 @@ class GroupJoinView(View): #メンバー申請
         #メール送信用データ生成(ここまで)######
         try:
             send_mail(subject, message, sender, recipients) #通知メール送信
-            print("send_mail:", subject, message, sender, recipients)
+            # print("send_mail:", subject, message, sender, recipients)
             
         except BadHeaderError:
             return HttpResponse('無効なヘッダーが見つかりました。')
@@ -579,7 +599,7 @@ class GroupJoinView(View): #メンバー申請
     
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
-class GroupJoinStaffView(View): #スタッフ申請
+class GroupJoinStaffView(LoginMixinView): #スタッフ申請
     model=Group
     def get(self, request, *args, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
@@ -609,7 +629,7 @@ class GroupJoinStaffView(View): #スタッフ申請
         #メール送信用データ生成(ここまで)######
         try:
             send_mail(subject, message, sender, recipients) #通知メール送信
-            print("send_mail:", subject, message, sender, recipients)
+            # print("send_mail:", subject, message, sender, recipients)
             
         except BadHeaderError:
             return HttpResponse('無効なヘッダーが見つかりました。')
@@ -619,10 +639,20 @@ class GroupJoinStaffView(View): #スタッフ申請
 
         return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
 
-class EventJoinView(View): #イベント予約
+class EventJoinView(LoginMixinView): #イベント予約
     model=Event
     def get(self, request, *args, **kwargs):
         event = Event.objects.get(id=self.kwargs['pk'])
+        group_data = Group.objects.get(id=event.group.id)
+
+        staff_data = ApprovedStaff.objects.filter(
+            group = group_data, approved=True)
+
+        names = [data.staff for data in staff_data] 
+        #スタッフユーザーで無ければHTMLを返す　遷移させる
+        if not request.user in names:
+            return HttpResponse('<h1>%sさんは%sの編集権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
+        
         return render(request, 'reservation/event_join.html',{
             'event': event,
             

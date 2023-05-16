@@ -31,12 +31,6 @@
         <li class="nav-item">
             <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only"></span></a>
         </li>
-        {% comment %} <li class="nav-item">
-            <a class="nav-link" href="{% url 'fullcalendar' %}">fullcalendar<span class="sr-only"></span></a>
-        </li> {% endcomment %}
-        {% comment %} <li class="nav-item">
-            <a class="nav-link" href="{% url 'event_cal' %}">calendar<span class="sr-only"></span></a>
-        </li> {% endcomment %}
 
 
         {% if user.is_authenticated %}
@@ -46,9 +40,6 @@
             
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'gp_event_cal' %}">イベントカレンダー <span class="sr-only"></span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'event' %}">イベント <span class="sr-only"></span></a>
             </li>
             
             <li class="nav-item">

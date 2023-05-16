@@ -1,6 +1,9 @@
 from django.contrib import admin
 from .models import *
 
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'group_name')
+
 class EventAdmin(admin.ModelAdmin):
     list_display = ('pk','event_title', 'group', 'event_date', 'start_time', 'end_time')
 
@@ -19,7 +22,7 @@ class ApprovedStaffAdmin(admin.ModelAdmin):
 class JoinAdmin(admin.ModelAdmin):
     list_display = ('join_name', 'join_event', 'join')
 
-admin.site.register(Group)
+admin.site.register(Group, GroupAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(ApplyingMember, ApplyingMemberAdmin)
 admin.site.register(ApplyingStaff, ApplyingStaffAdmin)
