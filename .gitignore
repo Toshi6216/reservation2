@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=django
 a
 ignore/
+config/local_settings.py
 
 ### Django ###
 *.log
@@ -175,5 +176,3 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
 
-a
-config/local_settings.py
