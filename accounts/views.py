@@ -10,7 +10,8 @@ from django.http import HttpResponse
 from accounts.models import CustomUser
 from .forms import ProfileForm
 from django.http import HttpResponse,HttpResponseRedirect
-
+from django.contrib.auth import views as auth_views
+from django.views.generic.edit import FormView
 
 #user確認用view
 class OnlyYouMixin(UserPassesTestMixin):
@@ -79,3 +80,14 @@ class ProfileEditView(OnlyYouMixin, UpdateView):
     def get_success_url(self):
         return reverse("userprofile", kwargs={"pk": self.kwargs["pk"]})
 
+# class PasswordResetView(PasswordContextMixin, FormView):
+#     email_template_name = 'registration/password_reset_email.html'
+#     extra_email_context = None
+#     form_class = PasswordResetForm
+#     from_email = None
+#     html_email_template_name = None
+#     subject_template_name = 'registration/password_reset_subject.txt'
+#     success_url = reverse_lazy('password_reset_done')
+#     template_name = 'registration/password_reset_form.html'
+#     title = _('Password reset')
+#     token_generator = default_token_generator

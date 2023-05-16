@@ -2,14 +2,14 @@
 
 {% block content %}
 <h1>イベントカレンダー</h1>
-<div class="row my-4 ">
-    <div class="col-md-8">
-
             <a class="btn btn-warning" href="{% url 'gp_event_cal' %}">今月</a>
             <a class="btn btn-primary" href="{% url 'gp_event_cal' month_previous.year month_previous.month %}">前月</a>
         
             <a class="btn btn-primary" href="{% url 'gp_event_cal' month_next.year month_next.month %}">次月</a>
             <h3>{{ month_current | date:"Y年m月" }}</h3>
+<div class="row my-4 ">
+    {% comment %} <div class="col-md-8"> {% endcomment %}
+
 
         <div class="card border-info">
                 {% comment %} <table class="table border-dark " style="table-layout:fixed;"> {% endcomment %}
@@ -74,15 +74,15 @@
         
             </div>  
         {% endfor %}
-    </div>  
+    {% comment %} </div>   {% endcomment %}
  
            </div> 
-        <div class="col-md-4">
+        {% comment %} <div class="col-md-4">
   
             <div class="card">
             <h5 class="card-header">group member...</h5>
             </div>
-        </div>
+        </div> {% endcomment %}
 
 
 {% endblock %}

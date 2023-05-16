@@ -1,0 +1,126 @@
+{% extends 'reservation/base.html' %}
+
+{% block content %}
+<h1>{{ group_data.group_name }} カレンダー</h1>
+<p><a class='btn btn-primary' href="{% url 'group_detail' group_data.pk %}">グループ詳細へ</a></p>
+
+<div class="row my-4 ">
+    <div class="col-md-7">
+
+        <a class="btn btn-warning" href="{% url 'group_detail_cal' group_data.pk %}">今月</a>
+        <a class="btn btn-primary" href="{% url 'group_detail_cal' group_data.pk month_previous.year month_previous.month %}">前月</a>
+    
+        <a class="btn btn-primary" href="{% url 'group_detail_cal' group_data.pk month_next.year month_next.month %}">次月</a>
+        <h3>{{ month_current | date:"Y年m月" }}</h3>
+
+        <div class="card border-info">
+
+                <table class="table border-dark " style="table-layout:fixed;">
+            
+                    <thead>
+                        <tr >
+                            {% for w in week_names %}
+                                <th >{{ w }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for week in month_days %}
+                        <tr >
+                            {% for day in week %}
+                                {% if now == day %}
+                                    <td class="table-success rsv_day  rs_{{day }}"  style="width:80px;"><!--今日のマスを緑にする-->
+                                    <div hidden class="date_hide active">{{day}}</div>
+                                {% elif day in days %}
+                                    <td class="table-warning rsv_day rs_{{day }}"  style="width:80px;" >
+                                    <div hidden class="date_hide active">{{day}}</div><!--text検索できるように非表示で日付を入れておく-->
+
+                                {% else %}
+                                    <td class="rsv_day rs_{{day }}"  style="width:80px;" >
+                                    <div hidden class="date_hide active">{{day}}</div>
+                                {% endif %}
+
+                                    {% if month_current.month != day.month %}
+                                        {{ day | date:"m/d" }}
+                            
+                                    {% else %}
+                                        {{ day.day }}
+                                    {% endif %}
+                                    </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+        </div>
+ 
+
+
+        <div class="card border-info " >
+
+            {% for event in event_data %}
+
+                <div class=" card-body event_hide event_card {{event.event_date}}" > 
+
+                        <h5 class="card-title">#{{ event.id }}/{{ event.event_title }} <div class="date_class">{{event.event_date}}</div></h5>
+                        <p>{{ event.start_time }}-{{ event.end_time }}</p>
+                        <p class="card-text ">{{ event.event_detail|truncatechars:100 }}</p>
+                        
+                        <p ><a href="{% url 'group_detail' event.group.pk  %} " class="btn btn-success">{{ event.group }}</a></p>
+                        
+                        {% if not event.pk in join_event_list %}<!---->
+                        <p class="my-1">
+                            <a href="{% url 'event_join' event.pk  %} " class="btn btn-success">event参加</a>
+                        </p>
+                            
+                        {% endif %}
+
+
+
+                        {% if is_group_staff %}<!--staffでなければ表示しない-->
+                            <a href="{% url 'event_edit' event.pk  %} " class="btn btn-warning">event編集</a>
+                            <a href="{% url 'event_delete' event.pk %}" class="btn btn-danger">削除する</a>
+                        {% endif %}
+            
+                </div>  
+            {% endfor %}
+        </div> 
+    </div>
+
+
+
+    <div class="card col-md-5 my-2">
+        <div class="card-body">
+            <h4 class="card-title mb-3"><div hidden>#{{ group_data.pk }}</div>{{ group_data.group_name }} </h4><a href="{% url 'group_join_staff' group_data.pk  %}" class="btn btn-danger">スタッフ申請</a>
+            <h5>グループオーナー：{{ group_data.group_owner.nickname }}</h5>
+            <p class="card-text mb-3">{{ group_data.group_detail }}</p>
+            
+            <ul class="list-group listgroup-flush ">
+
+                <li class="list-group-item">
+                <p>【MEMBER】</p>
+                    {% for m_name in member_names %}
+                    {{ m_name.nickname }} &ensp;
+                    {% endfor %} 
+                </li> 
+                
+                <input type="hidden" id="redirect-url" value="{% url 'group_detail_cal' group_data.pk %}">
+                <li class="list-group-item">
+                <p>【EVENT】</p>
+                    {% for event in event_data %}
+                    <p><a href="{% url 'event_detail' event.pk %}">{{ event.event_title }}({{ event.event_date }})</a><button class="btn btn-success" onclick="highlightDay('{{ event.event_date }}', '{{ event.group.pk }}', '{{ month_current }}')">表示</button>
+                    </p> <!-- イベント詳細へのリンク追加 -->
+                   
+                    {% endfor %} 
+                </li>
+            </ul> 
+        </div>
+    </div>
+
+</div> 
+
+
+
+{% endblock %}

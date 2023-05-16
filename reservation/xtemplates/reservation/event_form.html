@@ -1,0 +1,73 @@
+{% extends 'reservation/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="my-4">
+    <h2>Event Form</h2>
+</div>
+<form method="post" enctype="multipart/form-data" autocomplete="off"> 
+
+    {% csrf_token %}
+    {% comment %} {{ form.as_p }} {% endcomment %}
+
+    <div class="form-group my-2">
+    タイトル：{{ form.event_title }} 
+    </div>
+    <div class="form-group my-2">
+    説明：{{ form.event_detail }}
+    </div>
+    <div class="form-group my-2">
+    日にち：{{ form.event_date }}
+    </div>
+  
+    <div class="form-group">
+    開始：{{ form.start_time }}
+    </div>
+    終了：{{ form.end_time }} 
+    
+    {% comment %} <div class="form-group my-2">
+    開始：{{ form.start_hour }}:{{ form.start_minute }}
+    </div>
+    <div class="form-group my-2">
+    終了：{{ form.end_hour }}:{{ form.end_minute }}
+    </div> {% endcomment %}
+
+    <button class="btn btn-warning" type="submit">登録する</button>
+</form>
+{% if form.errors %}
+  <div class="alert alert-danger">
+    <ul>
+      {% for field in form %}
+        {% for error in field.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% endblock %}
+
+    {% block extra_js %}
+
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/timedropper/1.0/timedropper.min.css">
+   
+
+ 
+
+  <script>
+    $( function() {
+      let dateFormat = 'yy-mm-dd';
+            $('#id_event_date').datepicker({
+                dateFormat: dateFormat
+            });
+      
+
+    } );
+  </script> 
+  
+    {% endblock %}

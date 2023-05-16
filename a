@@ -9,4 +9,4 @@ pip install -r requirements.txt
 ・過去のスケジュールデータを削除（csv保存したうえで）
 ・予約時のstaffへの通知機能
 ・グループ加入申請時の通知機能
-
+・

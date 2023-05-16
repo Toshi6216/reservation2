@@ -30,4 +30,8 @@ urlpatterns = [
     path('event_join/<int:pk>/', views.EventJoinView.as_view(), name='event_join'), #イベント予約
 
 
+
+
+    path('contact_form/', views.contact_form, name='contact_form'),  # フォーム
+    path('contact_form/contact/complete/', views.complete, name='complete'),  # 完了画面
 ]

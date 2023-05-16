@@ -10,13 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-try:
-    from .local_settings import *
-except ImportError:
-    pass
 
 from pathlib import Path
 from django.urls import reverse_lazy
+import os
+
+from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,9 +30,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+
+try:
+    from .local_settings import *
+    DEBUG = True
+    ALLOWED_HOSTS = []
+    FRONTEND_URL = 'http://127.0.0.1:8000/accounts/login/?next=/'
+except ImportError:
+    DEBUG = False
+    from django.core.management.utils import get_random_secret_key
+    SECRET_KEY = get_random_secret_key()
+    ALLOWED_HOSTS = ['.pythonanywhere.com']
+    # FRONTEND_URL = 'http://###/accounts/login/?next=/'
 
 
 # Application definition
@@ -137,6 +148,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -158,7 +170,7 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 
 #メールアドレスが確認済である必要がある
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+# ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 #usernameは使用しない
 ACCOUNT_USERNAME_REQUIRED = False
@@ -172,12 +184,16 @@ ACCOUNT_FORMS = {
     'signup' : 'accounts.forms.SignupForm',
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #メールのコンソール表示　デバッグ用
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #メールのコンソール表示　デバッグ用
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 
 # メールサーバー用
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'toshimasa.doi.love.tap@gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'app.info.service.ht@gmail.com'
+EMAIL_HOST_PASSWORD=os.getenv("EMAIL_HOST_PASSWORD")
 
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-FRONTEND_URL = 'http://127.0.0.1:8000/'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+
