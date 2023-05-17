@@ -464,6 +464,7 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         #スタッフユーザーで無ければHTMLを返す　遷移させる
         if not request.user in names:
             return HttpResponse('<h1>%sさんは%sの編集権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
+            
         return super().get(request)
     
     def get_success_url(self):
@@ -543,6 +544,22 @@ class EventDetailView(DetailView):
     template_name = 'reservation/event_detail.html'
     def get(self, request, *args, **kwargs):
         event = Event.objects.get(id=self.kwargs['pk'])
+
+        group_data = Group.objects.get(id=event.group.id)
+
+        staff_data = ApprovedStaff.objects.filter(
+            group = group_data, approved=True)
+        member_data = ApprovedMember.objects.filter(
+            group = group_data, approved=True)
+
+        names = [data.staff for data in staff_data] 
+        names_m = [data.member for data in member_data] 
+        print(names)
+        print(names_m)
+
+        #スタッフユーザーで無ければHTMLを返す　遷移させる
+        if not((request.user in names) or (request.user in names_m)):
+            return HttpResponse('<h1>%sさんは%sの閲覧権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
         
         is_join=False
         for join_event in event.join_set.all():
@@ -645,13 +662,14 @@ class EventJoinView(LoginMixinView): #イベント予約
         event = Event.objects.get(id=self.kwargs['pk'])
         group_data = Group.objects.get(id=event.group.id)
 
-        staff_data = ApprovedStaff.objects.filter(
+        member_data = ApprovedMember.objects.filter(
             group = group_data, approved=True)
 
-        names = [data.staff for data in staff_data] 
+        names = [data.member for data in member_data] 
         #スタッフユーザーで無ければHTMLを返す　遷移させる
         if not request.user in names:
-            return HttpResponse('<h1>%sさんは%sの編集権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
+            return HttpResponse(
+                '<h1>%sさんは%sの予約権限がありません</h1>\n<p>member申請し承認をもらってください</p>' % (request.user.nickname, group_data.group_name ))
         
         return render(request, 'reservation/event_join.html',{
             'event': event,
@@ -669,40 +687,3 @@ class EventJoinView(LoginMixinView): #イベント予約
         # return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
         return HttpResponseRedirect( reverse_lazy('group_detail', kwargs={'pk':pk}))
  
-
-#以下お試し
-from .forms import ContactForm # 追加
-
-""" お問い合わせフォーム画面"""
-def contact_form(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-
-        if form.is_valid():
-            subject = form.cleaned_data['subject']
-            message = form.cleaned_data['message']
-            sender = settings.EMAIL_HOST_USER
-            send_to = form.cleaned_data['send_to']
-            myself = form.cleaned_data['myself']
-            recipients = []
-            recipients.append(send_to)
-           
-            if myself:
-                recipients.append(sender)
-            try:
-                send_mail(subject, message, sender, recipients)
-                print("send_mail:", subject, message, sender, recipients)
-                
-                
-            except BadHeaderError:
-                return HttpResponse('無効なヘッダーが見つかりました。')
-            return redirect('complete')
-
-    else:
-        form = ContactForm()
-    return render(request, 'contact/contact_form.html', {'form': form})
-
-
-""" 送信完了画面"""
-def complete(request):
-    return render(request, 'contact/complete.html')
