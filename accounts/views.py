@@ -18,9 +18,9 @@ class OnlyYouMixin(UserPassesTestMixin):
     raise_exception = True
 
     def test_func(self):
-        # 今ログインしてるユーザーのpkと、そのユーザー情報ページのpkが同じか、又はスーパーユーザーなら許可
+        # 今ログインしてるユーザーのpkと、そのユーザー情報ページのpkが同じなら許可
         user = self.request.user
-        return user.pk == self.kwargs['pk'] or user.is_superuser
+        return user.pk == self.kwargs['pk']
 
 #Profile内容確認用view
 class ProfileView(OnlyYouMixin, DetailView):

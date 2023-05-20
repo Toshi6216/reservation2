@@ -24,6 +24,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.conf import settings
 from django.core.mail import BadHeaderError, send_mail
+from datetime import datetime
 
 
 # from dateutil.relativedelta import relativedelta 
@@ -432,13 +433,13 @@ class GroupDetailCalView(mixins.MonthCalendarMixin, LoginMixinDetailView):
         chk_s=[ap_chk_s.group for ap_chk_s in approved_check_s]
         
         event_data = Event.objects.filter(group=pk).order_by('event_date')#指定グループのイベントでフィルター
-        days={event_days.event_date for event_days in event_data }
+        ev_days={event_days.event_date for event_days in event_data }
 
         group_data = Group.objects.get(id=self.kwargs['pk'])
 
         context.update(calendar_context)
         context['event_data'] = event_data #イベントのデータをコンテキストで渡す
-        context['days'] = days
+        context['ev_days'] = ev_days
         context['approved_check_s'] = approved_check_s
         # print(approved_check_s)
         context['group_data']=group_data
@@ -453,13 +454,30 @@ class EventCreateView(LoginRequiredMixin, CreateView):
     form_class = EventForm
     success_url = reverse_lazy('group_detail')
 
+    def get_initial(self):
+        initial = super().get_initial()
+
+        # URLから日付情報を取得
+        date_str = self.request.GET.get('date')
+        # print(date_str)
+        date = None
+        if date_str:
+            try:
+                # 日付文字列をdatetimeオブジェクトに変換
+                date = datetime.strptime(date_str, "%Y年%m月%d日").date()
+            except ValueError:
+                print("日付情報変換エラー")
+        initial['event_date'] = date  # フォームの日付フィールドの名前に応じて変更してください
+        print(date)
+        return initial
+
 
     def get(self, request, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
         # print(group_data)
         staff_data = ApprovedStaff.objects.filter(
             group = group_data, approved=True)
-
+       
         names = [data.staff for data in staff_data] 
         #スタッフユーザーで無ければHTMLを返す　遷移させる
         if not request.user in names:

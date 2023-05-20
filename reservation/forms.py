@@ -12,12 +12,12 @@ class EventForm(forms.ModelForm):
         model = Event
         # fields = '__all__'
         fields = [
-            "event_title", 
-            "event_detail",
+
             "event_date",
             "start_time",
             "end_time",
-    
+            "event_title", 
+            "event_detail",
         ]
 
 class SearchForm(forms.Form):

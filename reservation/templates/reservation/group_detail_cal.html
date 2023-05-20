@@ -1,6 +1,8 @@
 {% extends 'reservation/base.html' %}
 
 {% block content %}
+
+
 <h1>{{ group_data.group_name }} カレンダー</h1>
 <p><a class='btn btn-primary' href="{% url 'group_detail' group_data.pk %}">グループ詳細へ</a></p>
 
@@ -12,6 +14,11 @@
     
         <a class="btn btn-primary" href="{% url 'group_detail_cal' group_data.pk month_next.year month_next.month %}">次月</a>
         <h3>{{ month_current | date:"Y年m月" }}</h3>
+
+ 
+        <a href="{% url 'event_new' group_data.pk %}" id="create-event-btn" class="btn btn-primary my-2" type="button">イベント作成</a>
+
+        <div id="myElement" eventNewUrl="{% url 'event_new' group_data.pk %}"></div>
 
         <div class="card border-info">
 
@@ -31,7 +38,7 @@
                                 {% if now == day %}
                                     <td class="table-success rsv_day  rs_{{day }}"  style="width:80px;"><!--今日のマスを緑にする-->
                                     <div hidden class="date_hide active">{{day}}</div>
-                                {% elif day in days %}
+                                {% elif day in ev_days %}
                                     <td class="table-warning rsv_day rs_{{day }}"  style="width:80px;" >
                                     <div hidden class="date_hide active">{{day}}</div><!--text検索できるように非表示で日付を入れておく-->
 
