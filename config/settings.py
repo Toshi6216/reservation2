@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "sch_calendar",
     "full_calendar",
     'widget_tweaks',
+    'dbbackup',
 
 ]
 
@@ -190,10 +191,11 @@ ACCOUNT_FORMS = {
 
 # メールサーバー用
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'app.info.service.ht@gmail.com'
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD=os.getenv("EMAIL_HOST_PASSWORD")
 
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR/'dump'}

@@ -1,10 +1,14 @@
 {% extends 'reservation/base.html' %}
 
 {% block content %}
-    <div class="my-5">
+    <div class="my-3">
         <h3>グループ詳細</h3>
         <p><a class='btn btn-primary' href="{% url 'group_detail_cal' group_data.pk %}">グループのカレンダーへ</a></p>
     </div>
+
+    {% if is_group_staff %} <!--staffでなければ表示しない-->
+        <a href="{% url 'group_edit' group_data.pk  %} " class="btn btn-danger mb-3">group編集</a><a href="{% url 'event_new' group_data.pk  %} " class="btn btn-primary mb-3">event作成</a>
+    {% endif %}
 
     <div class="card mb-3 col-lg-auto" style="">
 
@@ -83,9 +87,6 @@
                             {% endfor %} 
                         </li>
                     </ul>
-                    {% if is_group_staff %} <!--staffでなければ表示しない-->
-                        <a href="{% url 'group_edit' group_data.pk  %} " class="btn btn-danger mb-3">group編集</a><a href="{% url 'event_new' group_data.pk  %} " class="btn btn-primary mb-3">event作成</a>
-                    {% endif %}
         </div>
                       
     </div>
@@ -105,8 +106,6 @@
                        </p>
                         
                     {% endif %}
-
-
 
                     {% if is_group_staff %}<!--staffでなければ表示しない-->
                         <a href="{% url 'event_edit' event.pk  %} " class="btn btn-warning">event編集</a>

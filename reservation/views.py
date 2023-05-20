@@ -24,6 +24,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.conf import settings
 from django.core.mail import BadHeaderError, send_mail
+from datetime import datetime
 
 
 # from dateutil.relativedelta import relativedelta 
@@ -432,13 +433,13 @@ class GroupDetailCalView(mixins.MonthCalendarMixin, LoginMixinDetailView):
         chk_s=[ap_chk_s.group for ap_chk_s in approved_check_s]
         
         event_data = Event.objects.filter(group=pk).order_by('event_date')#指定グループのイベントでフィルター
-        days={event_days.event_date for event_days in event_data }
+        ev_days={event_days.event_date for event_days in event_data }
 
         group_data = Group.objects.get(id=self.kwargs['pk'])
 
         context.update(calendar_context)
         context['event_data'] = event_data #イベントのデータをコンテキストで渡す
-        context['days'] = days
+        context['ev_days'] = ev_days
         context['approved_check_s'] = approved_check_s
         # print(approved_check_s)
         context['group_data']=group_data
@@ -453,17 +454,35 @@ class EventCreateView(LoginRequiredMixin, CreateView):
     form_class = EventForm
     success_url = reverse_lazy('group_detail')
 
+    def get_initial(self):
+        initial = super().get_initial()
+
+        # URLから日付情報を取得
+        date_str = self.request.GET.get('date')
+        # print(date_str)
+        date = None
+        if date_str:
+            try:
+                # 日付文字列をdatetimeオブジェクトに変換
+                date = datetime.strptime(date_str, "%Y年%m月%d日").date()
+            except ValueError:
+                print("日付情報変換エラー")
+        initial['event_date'] = date  # フォームの日付フィールドの名前に応じて変更してください
+        print(date)
+        return initial
+
 
     def get(self, request, **kwargs):
         group_data = Group.objects.get(id=self.kwargs['pk'])
         # print(group_data)
         staff_data = ApprovedStaff.objects.filter(
             group = group_data, approved=True)
-
+       
         names = [data.staff for data in staff_data] 
         #スタッフユーザーで無ければHTMLを返す　遷移させる
         if not request.user in names:
             return HttpResponse('<h1>%sさんは%sの編集権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
+            
         return super().get(request)
     
     def get_success_url(self):
@@ -543,6 +562,22 @@ class EventDetailView(DetailView):
     template_name = 'reservation/event_detail.html'
     def get(self, request, *args, **kwargs):
         event = Event.objects.get(id=self.kwargs['pk'])
+
+        group_data = Group.objects.get(id=event.group.id)
+
+        staff_data = ApprovedStaff.objects.filter(
+            group = group_data, approved=True)
+        member_data = ApprovedMember.objects.filter(
+            group = group_data, approved=True)
+
+        names = [data.staff for data in staff_data] 
+        names_m = [data.member for data in member_data] 
+        print(names)
+        print(names_m)
+
+        #スタッフユーザーで無ければHTMLを返す　遷移させる
+        if not((request.user in names) or (request.user in names_m)):
+            return HttpResponse('<h1>%sさんは%sの閲覧権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
         
         is_join=False
         for join_event in event.join_set.all():
@@ -645,13 +680,14 @@ class EventJoinView(LoginMixinView): #イベント予約
         event = Event.objects.get(id=self.kwargs['pk'])
         group_data = Group.objects.get(id=event.group.id)
 
-        staff_data = ApprovedStaff.objects.filter(
+        member_data = ApprovedMember.objects.filter(
             group = group_data, approved=True)
 
-        names = [data.staff for data in staff_data] 
+        names = [data.member for data in member_data] 
         #スタッフユーザーで無ければHTMLを返す　遷移させる
         if not request.user in names:
-            return HttpResponse('<h1>%sさんは%sの編集権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
+            return HttpResponse(
+                '<h1>%sさんは%sの予約権限がありません</h1>\n<p>member申請し承認をもらってください</p>' % (request.user.nickname, group_data.group_name ))
         
         return render(request, 'reservation/event_join.html',{
             'event': event,
@@ -669,40 +705,3 @@ class EventJoinView(LoginMixinView): #イベント予約
         # return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
         return HttpResponseRedirect( reverse_lazy('group_detail', kwargs={'pk':pk}))
  
-
-#以下お試し
-from .forms import ContactForm # 追加
-
-""" お問い合わせフォーム画面"""
-def contact_form(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-
-        if form.is_valid():
-            subject = form.cleaned_data['subject']
-            message = form.cleaned_data['message']
-            sender = settings.EMAIL_HOST_USER
-            send_to = form.cleaned_data['send_to']
-            myself = form.cleaned_data['myself']
-            recipients = []
-            recipients.append(send_to)
-           
-            if myself:
-                recipients.append(sender)
-            try:
-                send_mail(subject, message, sender, recipients)
-                print("send_mail:", subject, message, sender, recipients)
-                
-                
-            except BadHeaderError:
-                return HttpResponse('無効なヘッダーが見つかりました。')
-            return redirect('complete')
-
-    else:
-        form = ContactForm()
-    return render(request, 'contact/contact_form.html', {'form': form})
-
-
-""" 送信完了画面"""
-def complete(request):
-    return render(request, 'contact/complete.html')

@@ -21,7 +21,8 @@ $(function(){
   sessionStorage.removeItem('auto_refresh'); //sessionStorageに保存したデータを削除
   sessionStorage.removeItem('date'); //sessionStorageに保存したデータを削除
 
-
+  var input_date
+  var group_id
 
   $('td').on('click',
   function(){
@@ -34,12 +35,18 @@ $(function(){
     var active_date = $(this).find('.active').text()
     console.log(active_date);
 
+
     $('.'+active_date).addClass("active_event");
 
+    var myElement = document.getElementById("myElement");
+    var eventNewUrl = myElement.getAttribute("eventNewUrl");
+    console.log(eventNewUrl)
+    $('#create-event-btn').attr('href', eventNewUrl + "?date=" + active_date)
 
   },
 
   );
+
 
   
   $(window).scroll(function () {
@@ -50,7 +57,8 @@ $(function(){
     }
   });
 });
-// クリックした日付のクラス
+
+
   
 function highlightDay(date, group_pk, month_current) { //グループのカレンダーでイベントの表示ボタンを押すとカレンダーの日付に色をつけ、イベント表示
   
@@ -59,7 +67,8 @@ function highlightDay(date, group_pk, month_current) { //グループのカレ�
   const dateRegex = /^(\d{4})年(\d{1,2})月(\d{1,2})日$/;
   const matches = date.match(dateRegex); // 正規表現で年、月、日を抽出
   const matches_current = month_current.match(dateRegex); // 正規表現で年、月を抽出(現在の年月)
-  
+  console.log("date",date)
+  console.log(dateRegex)
   
   if (!matches) {
     console.error('Invalid date format:', date);
@@ -77,8 +86,8 @@ function highlightDay(date, group_pk, month_current) { //グループのカレ�
   const year_now = parseInt(matches_current[1]); // 年を数値に変換して取得
   const month_now = parseInt(matches_current[2]); // 月を数値に変換して取得
   
-  console.log(year,month,day);
-  console.log(year_now, month_now);
+  // console.log(year,month,day);
+  // console.log(year_now, month_now);
   if (year==year_now && month==month_now){
     console.log("OK");
     var elements = document.getElementsByClassName("rs_" + date);
@@ -91,7 +100,7 @@ function highlightDay(date, group_pk, month_current) { //グループのカレ�
   
     }
   }else{
-    console.log("NG");
+    // console.log("NG");
     // 新しいURLを作成する
     const urlInput = document.querySelector('#redirect-url');
     var url = urlInput.value  + year + "/" + month + "/";
@@ -104,8 +113,10 @@ function highlightDay(date, group_pk, month_current) { //グループのカレ�
     sessionStorage.setItem('date', date); //sessionStorageにデータを保存
 
     window.location.href = url; //カレンダーの月を変えるため遷移
+    console.log(url);
 
   }
+
 
 
 }

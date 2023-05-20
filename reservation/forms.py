@@ -12,12 +12,12 @@ class EventForm(forms.ModelForm):
         model = Event
         # fields = '__all__'
         fields = [
-            "event_title", 
-            "event_detail",
+
             "event_date",
             "start_time",
             "end_time",
-    
+            "event_title", 
+            "event_detail",
         ]
 
 class SearchForm(forms.Form):
@@ -27,10 +27,6 @@ class SearchForm(forms.Form):
         required=False,
         )
 
-
-
-   
-
         
 class GroupForm(forms.ModelForm):
     class Meta:
@@ -38,8 +34,3 @@ class GroupForm(forms.ModelForm):
         fields = ("group_name", "group_detail")
 
         
-class ContactForm(forms.Form):
-    subject = forms.CharField(label='件名', max_length=100)
-    send_to = forms.EmailField(label='Email', help_text='※ご確認の上、正しく入力してください。')
-    message = forms.CharField(label='メッセージ', widget=forms.Textarea)
-    myself = forms.BooleanField(label='同じ内容を受け取る', required=False)
