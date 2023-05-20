@@ -497,6 +497,35 @@ class EventCreateView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
         obj = form.save(commit=False)
         obj.group = Group.objects.get(id=self.kwargs['pk'])
+
+        group_data = Group.objects.get(id=self.kwargs['pk'])
+        user_data = CustomUser.objects.get(email=self.request.user)
+        # print(pk)
+        #グループページに遷移
+        # return HttpResponseRedirect( reverse_lazy('group'))
+
+        #メール送信用データ生成######
+        subject = "グループ「{}」のイベント追加".format(group_data.group_name)
+        # message = "「{}」に、".format(group_data.group_name) + "{0}({1})がメンバー申請しました。\n".format(user_data, user_data.nickname) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
+        message = "グループ「{}」のイベントが追加されました。\n".format(group_data.group_name) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
+        
+        sender = settings.EMAIL_HOST_USER
+
+        group_staff_query = group_data.approvedstaff_set.all()
+        # print("group_staff_query:", group_staff_query)
+        recipients = []
+        for gp in group_staff_query:
+            group_send_to = gp.staff.email
+            recipients.append(group_send_to)
+        # send_mail(subject, message, sender, recipients) #通知メール送信
+        # print("send_mail:", subject, message, sender, recipients)
+        #メール送信用データ生成(ここまで)######
+        try:
+            send_mail(subject, message, sender, recipients) #通知メール送信
+            # print("send_mail:", subject, message, sender, recipients)
+            
+        except BadHeaderError:
+            return HttpResponse('無効なヘッダーが見つかりました。')
         
         obj.save()
         return super().form_valid(form)
