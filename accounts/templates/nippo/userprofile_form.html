@@ -1,0 +1,15 @@
+{% extends 'reservation/base.html' %}
+
+{% block content %}
+
+<div class="my-4">
+    <h2>Profile Form</h2>
+</div>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    {{ form.as_p }}
+    
+    <button class="btn btn-warning" type="submit">登録する</button>
+</form>
+{% endblock %}
