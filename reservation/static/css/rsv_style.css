@@ -56,9 +56,12 @@ main {
     background-color: #d9ffb6;
 } 
 
+/* イベント情報を隠す */
 .event_hide {
     display: none;
 }
+
+/* イベント情報表示 */
 .active_event {
     display: block;
 }

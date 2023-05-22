@@ -25,6 +25,7 @@ from django.db import transaction
 from django.conf import settings
 from django.core.mail import BadHeaderError, send_mail
 from datetime import datetime
+from django.core.mail import EmailMessage
 
 
 # from dateutil.relativedelta import relativedelta 
@@ -454,10 +455,11 @@ class EventCreateView(LoginRequiredMixin, CreateView):
     form_class = EventForm
     success_url = reverse_lazy('group_detail')
 
+    # カレンダーの日付をクリックしてイベント追加ページに遷移したときに日付の初期値を入れておく
     def get_initial(self):
         initial = super().get_initial()
 
-        # URLから日付情報を取得
+        # javascriptでURLに追加した日付情報を取得
         date_str = self.request.GET.get('date')
         # print(date_str)
         date = None
@@ -468,7 +470,7 @@ class EventCreateView(LoginRequiredMixin, CreateView):
             except ValueError:
                 print("日付情報変換エラー")
         initial['event_date'] = date  # フォームの日付フィールドの名前に応じて変更してください
-        print(date)
+        # print(date)
         return initial
 
 
@@ -498,6 +500,9 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         obj = form.save(commit=False)
         obj.group = Group.objects.get(id=self.kwargs['pk'])
 
+        
+    ### メール通知 ###
+    
         group_data = Group.objects.get(id=self.kwargs['pk'])
         user_data = CustomUser.objects.get(email=self.request.user)
         # print(pk)
@@ -508,24 +513,28 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         subject = "グループ「{}」のイベント追加".format(group_data.group_name)
         # message = "「{}」に、".format(group_data.group_name) + "{0}({1})がメンバー申請しました。\n".format(user_data, user_data.nickname) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
         message = "グループ「{}」のイベントが追加されました。\n".format(group_data.group_name) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
-        
         sender = settings.EMAIL_HOST_USER
-
         group_staff_query = group_data.approvedstaff_set.all()
-        # print("group_staff_query:", group_staff_query)
+        group_member_query = group_data.approvedmember_set.all()
+
         recipients = []
+        bcc = []
         for gp in group_staff_query:
             group_send_to = gp.staff.email
-            recipients.append(group_send_to)
-        # send_mail(subject, message, sender, recipients) #通知メール送信
-        # print("send_mail:", subject, message, sender, recipients)
+            bcc.append(group_send_to)
+        for gp_m in group_member_query:
+            group_send_to_m = gp_m.member.email
+            bcc.append(group_send_to_m)
+        bcc = set(bcc)
+        msg = EmailMessage(subject, message, sender, recipients, bcc) #通知メール送信オブジェクトの作成
+        print("msg:", subject, message, sender, recipients, bcc)
         #メール送信用データ生成(ここまで)######
         try:
-            send_mail(subject, message, sender, recipients) #通知メール送信
-            # print("send_mail:", subject, message, sender, recipients)
+            msg.send() #通知メール送信
             
         except BadHeaderError:
             return HttpResponse('無効なヘッダーが見つかりました。')
+    ### メール通知終わり ###
         
         obj.save()
         return super().form_valid(form)
@@ -635,6 +644,7 @@ class GroupJoinView(LoginMixinView): #メンバー申請
         #グループページに遷移
         # return HttpResponseRedirect( reverse_lazy('group'))
 
+    ### メール通知 ###
         #メール送信用データ生成######
         subject = "グループ加入申請(member)"
         message = "「{}」に、".format(group_data.group_name) + "{0}({1})がメンバー申請しました。\n".format(user_data, user_data.nickname) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
@@ -643,20 +653,24 @@ class GroupJoinView(LoginMixinView): #メンバー申請
 
         group_staff_query = group_data.approvedstaff_set.all()
         # print("group_staff_query:", group_staff_query)
+
         recipients = []
+        bcc = []
         for gp in group_staff_query:
             group_send_to = gp.staff.email
-            recipients.append(group_send_to)
-        # send_mail(subject, message, sender, recipients) #通知メール送信
-        # print("send_mail:", subject, message, sender, recipients)
+            bcc.append(group_send_to)
+
+        bcc = set(bcc)
+        msg = EmailMessage(subject, message, sender, recipients, bcc) #通知メール送信オブジェクトの作成
+        print("msg:", subject, message, sender, recipients, bcc)
         #メール送信用データ生成(ここまで)######
         try:
-            send_mail(subject, message, sender, recipients) #通知メール送信
-            # print("send_mail:", subject, message, sender, recipients)
+            msg.send() #通知メール送信
             
         except BadHeaderError:
             return HttpResponse('無効なヘッダーが見つかりました。')
-       
+    ### メール通知終わり ###
+
         user_data.applyingmember_set.create(member=self.request.user, group=group_data, applying=True)
         pk=user_data.pk
         
@@ -684,19 +698,38 @@ class GroupJoinStaffView(LoginMixinView): #スタッフ申請
 
         group_staff_query = group_data.approvedstaff_set.all()
         # print("group_staff_query:", group_staff_query)
+        
+        # recipients = []
+        # for gp in group_staff_query:
+        #     group_send_to = gp.staff.email
+        #     recipients.append(group_send_to)
+        # # send_mail(subject, message, sender, recipients) #通知メール送信
+        # # print("send_mail:", subject, message, sender, recipients)
+        # #メール送信用データ生成(ここまで)######
+        # try:
+        #     send_mail(subject, message, sender, recipients) #通知メール送信
+        #     # print("send_mail:", subject, message, sender, recipients)
+            
+        # except BadHeaderError:
+        #     return HttpResponse('無効なヘッダーが見つかりました。')
+        
+        
         recipients = []
+        bcc = []
         for gp in group_staff_query:
             group_send_to = gp.staff.email
-            recipients.append(group_send_to)
-        # send_mail(subject, message, sender, recipients) #通知メール送信
-        # print("send_mail:", subject, message, sender, recipients)
+            bcc.append(group_send_to)
+
+        bcc = set(bcc)
+        msg = EmailMessage(subject, message, sender, recipients, bcc) #通知メール送信オブジェクトの作成
+        print("msg:", subject, message, sender, recipients, bcc)
         #メール送信用データ生成(ここまで)######
         try:
-            send_mail(subject, message, sender, recipients) #通知メール送信
-            # print("send_mail:", subject, message, sender, recipients)
+            msg.send() #通知メール送信
             
         except BadHeaderError:
             return HttpResponse('無効なヘッダーが見つかりました。')
+    ### メール通知終わり ###
 
         user_data.applyingstaff_set.create(staff=self.request.user, group=group_data, applying=True)
         pk=user_data.pk
