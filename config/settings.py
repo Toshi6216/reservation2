@@ -19,6 +19,7 @@ from django.core.management.utils import get_random_secret_key
 from dotenv import load_dotenv
 load_dotenv()
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,7 +43,7 @@ except ImportError:
     from django.core.management.utils import get_random_secret_key
     SECRET_KEY = get_random_secret_key()
     ALLOWED_HOSTS = ['.pythonanywhere.com']
-    FRONTEND_URL = 'http://TestApp0123.pythonanywhere.com/accounts/login/?next=/'
+    FRONTEND_URL = 'http://'+ os.getenv("Username") +'.pythonanywhere.com/accounts/login/?next=/'
 
 
 # Application definition
@@ -199,3 +200,5 @@ EMAIL_USE_TLS = True
 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR/'dump'}
+
+LOGIN_REDIRECT_URL = reverse_lazy('home')
