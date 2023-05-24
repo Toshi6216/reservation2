@@ -4,7 +4,7 @@ from django.views.generic.detail import DetailView
 
 from .models import Group, Event, ApprovedMember, ApprovedStaff, ApplyingMember, ApplyingStaff, Join
 from .forms import EventForm, GroupForm, SearchForm
-from accounts.models import CustomUser
+from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.http import HttpResponse,HttpResponseRedirect
 from django.template import loader
@@ -27,6 +27,7 @@ from django.core.mail import BadHeaderError, send_mail
 from datetime import datetime
 from django.core.mail import EmailMessage
 
+CustomUser = get_user_model()
 
 # from dateutil.relativedelta import relativedelta 
 

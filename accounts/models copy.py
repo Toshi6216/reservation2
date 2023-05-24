@@ -25,7 +25,7 @@ class UserManager(BaseUserManager):
             password=password,
             )
 
-        user.is_staff = True
+        user.staff = True
         user.save(using=self._db)
         return user
 
@@ -35,7 +35,7 @@ class UserManager(BaseUserManager):
             password=password,
             )
 
-        user.is_staff = True
+        user.staff = True
         user.admin = True
         user.save(using=self._db)
         return user
@@ -51,8 +51,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField('名', max_length=150)
     last_name = models.CharField('姓', max_length=150)
     nickname = models.CharField('ニックネーム', max_length=150,  null=True, blank=True)
-    is_active = models.BooleanField('active', default=True)
-    is_staff = models.BooleanField('staff', default=False) #staffかどうか
+    active = models.BooleanField('active', default=True)
+    staff = models.BooleanField('staff', default=False) #staffかどうか
     admin = models.BooleanField('admin', default=False) 
 
     objects = UserManager()
@@ -65,12 +65,23 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def has_perm(self, perm, obj=None):
-        return self.admin
+        return self.is_admin
 
     def has_module_perms(self, app_label):
+        return self.is_admin
+
+
+    @property
+    def is_staff(self):
+        return self.staff
+
+    @property
+    def is_admin(self):
         return self.admin
 
-
+    @property
+    def is_active(self):
+        return self.active
 
 
     class Meta(AbstractBaseUser.Meta):

@@ -1,7 +1,8 @@
 from django.db import models
-from accounts.models import CustomUser, StaffUser, MemberUser
+from accounts.models import  StaffUser, MemberUser
 from django.core.exceptions import ValidationError
-
+from django.contrib.auth import get_user_model
+CustomUser = get_user_model()
 
 class Group(models.Model):
     group_name = models.CharField(max_length=150)
