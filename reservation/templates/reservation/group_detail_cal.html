@@ -71,11 +71,11 @@
 
                 <div class=" card-body event_hide event_card {{event.event_date}}" > 
 
-                        <h5 class="card-title">#{{ event.id }}/{{ event.event_title }} <div class="date_class">{{event.event_date}}</div></h5>
+                        <h5 class="card-title"><a href="{% url 'event_detail' event.pk %}">#{{ event.id }}/{{ event.event_title }}</a> <div class="date_class">{{event.event_date}}</div></h5>
                         <p>{{ event.start_time }}-{{ event.end_time }}</p>
                         <p class="card-text ">{{ event.event_detail|truncatechars:100 }}</p>
                         
-                        <p ><a href="{% url 'group_detail' event.group.pk  %} " class="btn btn-success">{{ event.group }}</a></p>
+                        <p ><a href="{% url 'group_detail' event.group.pk  %} " class="btn btn-primary">{{ event.group }}</a></p>
                         
                         {% if not event.pk in join_event_list %}<!---->
                         <p class="my-1">
