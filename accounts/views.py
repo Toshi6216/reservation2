@@ -7,11 +7,13 @@ from django.urls import reverse_lazy, reverse
 from reservation.models import *
 from django.http import HttpResponse
 
-from accounts.models import CustomUser
 from .forms import ProfileForm
 from django.http import HttpResponse,HttpResponseRedirect
 from django.contrib.auth import views as auth_views
 from django.views.generic.edit import FormView
+from django.contrib.auth import get_user_model
+
+CustomUser = get_user_model()
 
 #user確認用view
 class OnlyYouMixin(UserPassesTestMixin):
