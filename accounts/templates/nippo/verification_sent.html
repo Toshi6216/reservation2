@@ -1,6 +1,4 @@
-{% extends 'reservation/base.html' %}
-
-{% load crispy_forms_tags %}
+{% extends "base.html" %}
 
 {% load i18n %}
 
@@ -9,11 +7,7 @@
 {% endblock %}
 
 {% block content %}
-{% comment %} <div class="container my-5 bg-light p-4" style="max-width:450px;"> {% endcomment %}
-<div class="card  my-5 mx-auto">
-  <div class="carl-body">
-  <div class="card-body">
-
+<div class="container my-5 bg-light p-4" style="max-width:450px;">
   <p class="text-center">
     <b><u>確認用のメールを送信しました！</b></u>
   </p>
@@ -21,15 +15,11 @@
     メールの有効性が確認できるまでユーザー登録は完了となりません。
     メールに記載されたリンクをクリックして、ユーザー登録を完了させてください。
   </p>
-  <div class="my-3 text-center">
-    <a href={% url 'home' %} type="button" class="btn btn-danger ">トップへ</a>
+  <div class="my-3">
+    <a href={% url 'nippo-list' %} type="button" class="btn btn-danger form-control">トップへ</a>
   </div>
   <div class="text-right">
     <a href={% url 'account_login' %} class="my-4">メールか届かない(再送する)</a>
   </div>
 </div>
-</div>
-</div>
-
-
 {% endblock %}

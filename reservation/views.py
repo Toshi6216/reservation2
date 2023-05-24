@@ -4,7 +4,7 @@ from django.views.generic.detail import DetailView
 
 from .models import Group, Event, ApprovedMember, ApprovedStaff, ApplyingMember, ApplyingStaff, Join
 from .forms import EventForm, GroupForm, SearchForm
-from accounts.models import CustomUser
+from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.http import HttpResponse,HttpResponseRedirect
 from django.template import loader
@@ -27,6 +27,7 @@ from django.core.mail import BadHeaderError, send_mail
 from datetime import datetime
 from django.core.mail import EmailMessage
 
+CustomUser = get_user_model()
 
 # from dateutil.relativedelta import relativedelta 
 
@@ -492,6 +493,8 @@ class EventCreateView(LoginRequiredMixin, CreateView):
         return reverse('group_detail', kwargs={'pk':pk})
     
     def form_valid(self, form):
+        n_event_title = form.cleaned_data["event_title"]
+        n_event_date = form.cleaned_data["event_date"]
         start_time = form.cleaned_data["start_time"]
         end_time = form.cleaned_data["end_time"]
         if start_time and end_time and start_time >= end_time: #開始時刻と終了時刻のバリデーション
@@ -499,20 +502,19 @@ class EventCreateView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
         obj = form.save(commit=False)
         obj.group = Group.objects.get(id=self.kwargs['pk'])
-
+        # print(obj.pk)
+        obj.save()
+        new_event = Event.objects.get(event_title=n_event_title)
+        # print(new_event.pk)
         
     ### メール通知 ###
-    
         group_data = Group.objects.get(id=self.kwargs['pk'])
         user_data = CustomUser.objects.get(email=self.request.user)
-        # print(pk)
-        #グループページに遷移
-        # return HttpResponseRedirect( reverse_lazy('group'))
 
         #メール送信用データ生成######
         subject = "グループ「{}」のイベント追加".format(group_data.group_name)
         # message = "「{}」に、".format(group_data.group_name) + "{0}({1})がメンバー申請しました。\n".format(user_data, user_data.nickname) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
-        message = "グループ「{}」のイベントが追加されました。\n".format(group_data.group_name) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
+        message = "グループ「{}」のイベントが追加されました。\n".format(group_data.group_name) +  "グループ：{0}\nイベント：{1}\n開催日：{2}\n時間：{3}～{4}\n".format(group_data.group_name, n_event_title, n_event_date, start_time, end_time) + settings.FRONTEND_URL + "event_detail/{}/".format(new_event.pk) 
         sender = settings.EMAIL_HOST_USER
         group_staff_query = group_data.approvedstaff_set.all()
         group_member_query = group_data.approvedmember_set.all()
@@ -536,7 +538,7 @@ class EventCreateView(LoginRequiredMixin, CreateView):
             return HttpResponse('無効なヘッダーが見つかりました。')
     ### メール通知終わり ###
         
-        obj.save()
+
         return super().form_valid(form)
 
 class LoginMixinView(LoginRequiredMixin, View):
@@ -690,6 +692,7 @@ class GroupJoinStaffView(LoginMixinView): #スタッフ申請
         group_data = Group.objects.get(id=self.kwargs['pk'])
         user_data = CustomUser.objects.get(email=self.request.user)
 
+    ### メール通知 ###
         #メール送信用データ生成######
         subject = "グループ加入申請(staff)"
         message = "「{}」に、".format(group_data.group_name) + "{0}({1})がスタッフ申請しました。\n".format(user_data, user_data.nickname) + settings.FRONTEND_URL + "group_detail/{}/".format(group_data.pk) 
@@ -697,22 +700,7 @@ class GroupJoinStaffView(LoginMixinView): #スタッフ申請
         sender = settings.EMAIL_HOST_USER
 
         group_staff_query = group_data.approvedstaff_set.all()
-        # print("group_staff_query:", group_staff_query)
-        
-        # recipients = []
-        # for gp in group_staff_query:
-        #     group_send_to = gp.staff.email
-        #     recipients.append(group_send_to)
-        # # send_mail(subject, message, sender, recipients) #通知メール送信
-        # # print("send_mail:", subject, message, sender, recipients)
-        # #メール送信用データ生成(ここまで)######
-        # try:
-        #     send_mail(subject, message, sender, recipients) #通知メール送信
-        #     # print("send_mail:", subject, message, sender, recipients)
-            
-        # except BadHeaderError:
-        #     return HttpResponse('無効なヘッダーが見つかりました。')
-        
+      
         
         recipients = []
         bcc = []
@@ -759,11 +747,37 @@ class EventJoinView(LoginMixinView): #イベント予約
     def post(self, request, *args, **kwargs):
         event = Event.objects.get(id=self.kwargs['pk'])
         user_data = CustomUser.objects.get(email=self.request.user)
+
+    ### メール通知 ###
+        #メール送信用データ生成######
+        subject = "イベント参加予約"
+        message = "グループ「{0}」のイベント「{1}」に、".format(event.group, event) + "{0} さん({1})が参加予約しました。\n".format(user_data, user_data.nickname) + "グループ：{0}\nイベント：{1}\n開催日：{2}\n時間：{3}～{4}\n".format(event.group, event, event.event_date, event.start_time, event.end_time) + settings.FRONTEND_URL + "event_detail/{}/".format(event.pk) 
+
+        sender = settings.EMAIL_HOST_USER
+        group_staff_query = event.group.approvedstaff_set.all()
+        
+        recipients = []
+        bcc = []
+        bcc.append(self.request.user)
+        for gp in group_staff_query:
+            group_send_to = gp.staff.email
+            bcc.append(group_send_to)
+
+        bcc = set(bcc)
+        msg = EmailMessage(subject, message, sender, recipients, bcc) #通知メール送信オブジェクトの作成
+        print("msg:", subject, message, sender, recipients, bcc)
+        #メール送信用データ生成(ここまで)######
+        try:
+            msg.send() #通知メール送信
+            
+        except BadHeaderError:
+            return HttpResponse('無効なヘッダーが見つかりました。')
+    ### メール通知終わり ###
+
+
         user_data.join_set.create(join_name=self.request.user, join_event=event, join=True)
-        # pk=user_data.pk
-        pk=event.group.pk
-        # print(pk)
+
         
         # return HttpResponseRedirect( reverse_lazy('userprofile', kwargs={'pk':pk}))
-        return HttpResponseRedirect( reverse_lazy('group_detail', kwargs={'pk':pk}))
+        return HttpResponseRedirect( reverse_lazy('event_detail', kwargs={'pk':event.pk}))
  

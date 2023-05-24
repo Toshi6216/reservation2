@@ -4,9 +4,6 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import UserManager, PermissionsMixin
 from django.utils import timezone
 
-
-
-
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -28,7 +25,7 @@ class UserManager(BaseUserManager):
             password=password,
             )
 
-        user.staff = True
+        user.is_staff = True
         user.save(using=self._db)
         return user
 
@@ -38,7 +35,7 @@ class UserManager(BaseUserManager):
             password=password,
             )
 
-        user.staff = True
+        user.is_staff = True
         user.admin = True
         user.save(using=self._db)
         return user
@@ -54,9 +51,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField('名', max_length=150)
     last_name = models.CharField('姓', max_length=150)
     nickname = models.CharField('ニックネーム', max_length=150,  null=True, blank=True)
-    active = models.BooleanField(default=True)
-    staff = models.BooleanField(default=False) #staffかどうか
-    admin = models.BooleanField(default=False) 
+    is_active = models.BooleanField('active', default=True)
+    is_staff = models.BooleanField('staff', default=False) #staffかどうか
+    admin = models.BooleanField('admin', default=False) 
 
     objects = UserManager()
     EMAIL_FIELD = 'email'
@@ -73,17 +70,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return self.admin
 
-    @property
-    def is_staff(self):
-        return self.staff
-
-    @property
-    def is_admin(self):
-        return self.admin
-
-    @property
-    def is_active(self):
-        return self.active
 
 
 
