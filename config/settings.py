@@ -69,7 +69,7 @@ INSTALLED_APPS = [
 
 ]
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'bootstrap4' # 入力フォームにBootstrap適用
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -171,7 +171,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 
-#メールアドレスが確認済である必要がある
+#メールアドレスが確認済である必要がある(確認メールからURLアクセスして認証)
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 #usernameは使用しない
