@@ -751,7 +751,7 @@ class EventJoinView(LoginMixinView): #イベント予約
     ### メール通知 ###
         #メール送信用データ生成######
         subject = "イベント参加予約"
-        message = "グループ「{0}」のイベント「{1}」に、".format(event.group, event) + "{0} さん({1})が参加予約しました。\n".format(user_data, user_data.nickname) + "グループ：{0}\nイベント：{1}\n開催日：{2}\n時間：{3}～{4}\n".format(event.group, event, event.event_date, event.start_time, event.end_time) + settings.FRONTEND_URL + "event_detail/{}/".format(event.pk) 
+        message = "グループ「{0}」のイベント「{1}」に、".format(event.group, event) + "{0} さん({1} {2})が参加予約しました。\n".format(user_data.nickname, user_data.last_name, user_data.first_name) + "グループ：{0}\nイベント：{1}\n開催日：{2}\n時間：{3}～{4}\n".format(event.group, event, event.event_date, event.start_time, event.end_time) + settings.FRONTEND_URL + "event_detail/{}/".format(event.pk) 
 
         sender = settings.EMAIL_HOST_USER
         group_staff_query = event.group.approvedstaff_set.all()
