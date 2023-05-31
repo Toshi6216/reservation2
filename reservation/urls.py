@@ -20,6 +20,7 @@ urlpatterns = [
     path('group/new/', views.GroupCreateView.as_view(), name='group_new'), #グループ作成
     path('group/signal/', views.groupSignal, name='group_signal'), #グループシグナル(#グループ登録時、同時にApprovedStaffにも登録される)
     path('group_edit/<int:pk>/',views.GroupEditView.as_view(), name="group_edit"), #グループ編集
+    path('group_delete/<int:pk>/',views.GroupDeleteView.as_view(), name="group_delete"), #グループ削除
     path('group_detail/<int:pk>/',views.GroupDetailView.as_view(), name="group_detail"), #グループ詳細
     path('group_detail_cal/<int:pk>/',views.GroupDetailCalView.as_view(), name="group_detail_cal"), #イベントカレンダー(指定のグループのイベント表示)
     path('group_detail_cal/<int:pk>/<int:year>/<int:month>/',views.GroupDetailCalView.as_view(), name="group_detail_cal"), #イベントカレンダー(指定のグループのイベント表示)

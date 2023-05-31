@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView, View, UpdateView, CreateView, DeleteView
 from django.views.generic.detail import DetailView
@@ -140,6 +141,15 @@ class GroupEditView(LoginRequiredMixin,UpdateView):
         if not request.user in names:
             return HttpResponse('<h1>%sさんは%sの編集権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
         return super().get(request)
+    
+    def get_context_data(self, **kwargs) :
+        context = super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+        group_data = get_object_or_404(Group, id=self.kwargs['pk'])
+        is_group_create = False
+        context['group_data'] = group_data
+        context['is_group_create'] = is_group_create # グループ削除ボタン表示
+        return context
 
 
 
@@ -584,6 +594,12 @@ class GroupCreateView(LoginRequiredMixin, CreateView):
     form_class = GroupForm
     success_url = reverse_lazy('group')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        is_group_create = True
+        context['is_group_create'] = is_group_create # グループ削除ボタン非表示
+        return context
+
     def form_valid(self, form):
         obj = form.save(commit=False)
         obj.group_owner = self.request.user
@@ -596,6 +612,24 @@ def groupSignal(sender, instance, created, **kwargs):
         user = instance.group_owner
         ApprovedStaff.objects.create(staff=user, group=instance, approved=True)
    
+
+#グループ削除のview
+class GroupDeleteView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        group_data = Group.objects.get(id=self.kwargs['pk'])
+        owner = group_data.group_owner
+        if not request.user == owner:
+            return HttpResponse('<h1>%sさんは%sのGroupの削除権限がありません</h1>' % (request.user.nickname, group_data.group_name ))
+
+        return render(request, 'reservation/group_delete.html',{
+            'group_data': group_data
+        })
+
+    def post(self, request, *args, **kwargs):
+        group_data = Group.objects.get(id=self.kwargs['pk'])
+        group_data.delete()
+        return redirect('home')
+
 
 #イベント詳細
 class EventDetailView(DetailView):
