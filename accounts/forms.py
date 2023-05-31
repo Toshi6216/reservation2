@@ -38,7 +38,14 @@ class SignupForm(UserCreationForm):
     
     class Meta:
         model = CustomUser
-        fields = ['email','first_name', 'last_name', 'nickname']
+        fields =('email','first_name', 'last_name', 'nickname')
+
+    # def save(self, commit=True):
+    #     #commit=Flseだと、DBに保存されない
+    #     user = super().save(commit=False)
+    #     user.email = self.cleaned_data["email"]
+    #     user.save()
+    #     return user
         
    # def signup(self, request, user):
    #     user.first_name = self.cleaned_data['first_name']
